@@ -1203,6 +1203,21 @@ button {
   font-size: 14px;
 }
 
+.form-status {
+  min-height: 21px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.form-status[data-status="success"] {
+  color: #227341;
+}
+
+.form-status[data-status="error"] {
+  color: #c32929;
+}
+
 .primary-btn,
 .outline-btn {
   display: inline-grid;
@@ -1230,6 +1245,12 @@ button {
   background: #66645f;
   border-color: #66645f;
   color: var(--paper);
+}
+
+.primary-btn:disabled,
+.outline-btn:disabled {
+  cursor: wait;
+  opacity: 0.55;
 }
 
 .auth-actions {
@@ -1412,6 +1433,21 @@ button {
 
 .admin-fields label:has(textarea) {
   grid-column: 1 / -1;
+}
+
+.admin-upload-field {
+  grid-column: 1 / -1;
+}
+
+.admin-upload-row {
+  display: grid;
+  grid-template-columns: 1fr minmax(180px, auto) auto;
+  gap: 10px;
+}
+
+.admin-upload-row input[type="file"] {
+  height: 48px;
+  padding: 10px;
 }
 
 .admin-fields input,
@@ -1933,6 +1969,10 @@ button {
   }
 
   .admin-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-upload-row {
     grid-template-columns: 1fr;
   }
 

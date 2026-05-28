@@ -89,18 +89,6 @@ const defaultSchedules = [
   { date: "2026.06.27", title: "월말 롱런 데이", place: "도심 순환 코스", note: "15K 선택 코스" },
 ];
 
-const ADMIN_USER = "ADMIN";
-const ADMIN_PASS = "0000";
-const ADMIN_SESSION_KEY = "kingkong-admin-session";
-const ADMIN_SESSION_VALUE = "kingkong-admin-v2";
-const STORE_KEYS = {
-  products: "kingkong-admin-products",
-  notices: "kingkong-admin-notices",
-  newsletters: "kingkong-admin-newsletters",
-  runnersVoice: "kingkong-admin-runners-voice",
-  schedules: "kingkong-admin-schedules",
-};
-
 const PRODUCT_IMAGE_FALLBACK = "picture/1777181388630.jpg";
 const DEFAULT_PRODUCT_IMAGES = {
   "notice-0601": "picture/20260426_072346.jpg",
@@ -110,25 +98,37 @@ const DEFAULT_PRODUCT_IMAGES = {
   kakao: "picture/1777181388630.jpg",
 };
 
-const products = loadCollection("products", defaultProducts);
-const notices = loadCollection("notices", defaultNotices);
-const newsletters = loadCollection("newsletters", defaultNewsletters);
-const runnersVoice = loadCollection("runnersVoice", defaultRunnersVoice);
-const schedules = loadCollection("schedules", defaultSchedules);
+const HAS_API = location.protocol !== "file:";
+const API_ENDPOINTS = {
+  content: "/api/content",
+  login: "/api/admin/login",
+  logout: "/api/admin/logout",
+  session: "/api/admin/session",
+  upload: "/api/upload",
+};
+const defaultContent = {
+  products: defaultProducts,
+  notices: defaultNotices,
+  newsletters: defaultNewsletters,
+  runnersVoice: defaultRunnersVoice,
+  schedules: defaultSchedules,
+};
+
+let siteContent = cloneData(defaultContent);
+let products = siteContent.products;
+let notices = siteContent.notices;
+let newsletters = siteContent.newsletters;
+let runnersVoice = siteContent.runnersVoice;
+let schedules = siteContent.schedules;
+let adminSession = false;
+let contentLoadError = "";
 
 function cloneData(data) {
   return JSON.parse(JSON.stringify(data));
 }
 
-function loadCollection(name, fallback) {
-  if (typeof localStorage === "undefined") return cloneData(fallback);
-  try {
-    const saved = localStorage.getItem(STORE_KEYS[name]);
-    const data = saved ? JSON.parse(saved) : cloneData(fallback);
-    return name === "products" ? migrateProductImages(data) : data;
-  } catch {
-    return cloneData(fallback);
-  }
+function isExternalAsset(name) {
+  return /^(https?:|data:|blob:)/i.test(String(name || ""));
 }
 
 function migrateProductImages(items) {
@@ -137,24 +137,100 @@ function migrateProductImages(items) {
     const currentImage = item.image || "";
     return {
       ...item,
-      image: currentImage.startsWith("picture/") ? currentImage : DEFAULT_PRODUCT_IMAGES[item.id] || PRODUCT_IMAGE_FALLBACK,
+      image: isExternalAsset(currentImage) || currentImage.startsWith("picture/")
+        ? currentImage
+        : DEFAULT_PRODUCT_IMAGES[item.id] || PRODUCT_IMAGE_FALLBACK,
     };
   });
 }
 
-function saveCollection(name, items) {
-  localStorage.setItem(STORE_KEYS[name], JSON.stringify(items));
+function applySiteContent(content) {
+  const source = content && typeof content === "object" ? content : {};
+  siteContent = {
+    products: migrateProductImages(Array.isArray(source.products) ? source.products : defaultProducts),
+    notices: Array.isArray(source.notices) ? source.notices : defaultNotices,
+    newsletters: Array.isArray(source.newsletters) ? source.newsletters : defaultNewsletters,
+    runnersVoice: Array.isArray(source.runnersVoice) ? source.runnersVoice : defaultRunnersVoice,
+    schedules: Array.isArray(source.schedules) ? source.schedules : defaultSchedules,
+  };
+  products = siteContent.products;
+  notices = siteContent.notices;
+  newsletters = siteContent.newsletters;
+  runnersVoice = siteContent.runnersVoice;
+  schedules = siteContent.schedules;
 }
 
-function resetCollection(name) {
-  localStorage.removeItem(STORE_KEYS[name]);
+function loadCollection(name, fallback) {
+  return cloneData(siteContent[name] || fallback);
+}
+
+async function requestJson(url, options = {}) {
+  if (!HAS_API) {
+    throw new Error("배포된 사이트에서만 저장할 수 있습니다.");
+  }
+
+  const response = await fetch(url, {
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
+    ...options,
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.error || "요청 처리 중 오류가 발생했습니다.");
+  }
+
+  return data;
+}
+
+async function loadRemoteContent() {
+  applySiteContent(defaultContent);
+  if (!HAS_API) return;
+
+  try {
+    contentLoadError = "";
+    applySiteContent(await requestJson(API_ENDPOINTS.content));
+  } catch (error) {
+    contentLoadError = error.message || "저장된 콘텐츠를 불러오지 못했습니다.";
+  }
+}
+
+async function checkAdminSession() {
+  if (!HAS_API) {
+    adminSession = false;
+    return;
+  }
+
+  try {
+    const result = await requestJson(API_ENDPOINTS.session);
+    adminSession = Boolean(result.authenticated);
+  } catch {
+    adminSession = false;
+  }
+}
+
+async function saveCollection(name, items) {
+  const result = await requestJson(API_ENDPOINTS.content, {
+    method: "PATCH",
+    body: JSON.stringify({ section: name, items }),
+  });
+  applySiteContent(result.content);
+  return result;
+}
+
+async function resetCollection(name) {
+  return saveCollection(name, cloneData(adminDefaults(name)));
 }
 
 function isAdminLoggedIn() {
-  return localStorage.getItem(ADMIN_SESSION_KEY) === ADMIN_SESSION_VALUE;
+  return adminSession;
 }
 
 function asset(name) {
+  if (isExternalAsset(name)) return name;
   return ASSET + name;
 }
 
@@ -655,14 +731,14 @@ const ADMIN_SECTIONS = [
   {
     name: "products",
     title: "가입안내 / 갤러리 카드",
-    description: "홈 카드, 가입안내 목록, 상세보기 화면을 관리합니다. 이미지는 assets 폴더의 파일명을 입력합니다.",
+    description: "홈 카드, 가입안내 목록, 상세보기 화면과 이미지를 관리합니다.",
     publicHref: "register.html",
     kind: "object",
     fields: [
       { key: "id", label: "ID", placeholder: "guide-2026" },
       { key: "name", label: "제목", placeholder: "신규 회원 가입 안내" },
       { key: "price", label: "보조 문구", placeholder: "상시 모집" },
-      { key: "image", label: "이미지 파일명", placeholder: "picture/20260314_074610.jpg" },
+      { key: "image", label: "이미지 URL", placeholder: "picture/20260314_074610.jpg", upload: true },
       { key: "type", label: "분류", placeholder: "guide / event / channel / notice" },
       { key: "date", label: "날짜", placeholder: "2026.05.28" },
       { key: "summary", label: "설명", placeholder: "카드와 상세 화면에 보일 설명", multiline: true },
@@ -735,6 +811,18 @@ function renderAdminField(field, item) {
   if (field.multiline) {
     return `<label>${label}<textarea data-admin-field="${field.key}" placeholder="${escapeHtml(field.placeholder || "")}">${value}</textarea></label>`;
   }
+  if (field.upload) {
+    return `
+      <label class="admin-upload-field">
+        ${label}
+        <span class="admin-upload-row">
+          <input data-admin-field="${field.key}" type="text" value="${value}" placeholder="${escapeHtml(field.placeholder || "")}">
+          <input data-admin-upload-for="${field.key}" type="file" accept="image/*">
+          <button class="outline-btn" type="button" data-admin-upload-button="${field.key}">업로드</button>
+        </span>
+      </label>
+    `;
+  }
   return `<label>${label}<input data-admin-field="${field.key}" type="text" value="${value}" placeholder="${escapeHtml(field.placeholder || "")}"></label>`;
 }
 
@@ -749,6 +837,7 @@ function renderAdminForm(section, item, index) {
       <div class="admin-fields">
         ${section.fields.map((field) => renderAdminField(field, item)).join("")}
       </div>
+      <p class="form-status" data-admin-status></p>
       <button class="primary-btn" type="submit">${isNew ? "추가하기" : "저장하기"}</button>
     </form>
   `;
@@ -801,7 +890,7 @@ function renderAdmin() {
       <div class="admin-toolbar">
         <div>
           <strong>관리자 모드</strong>
-          <span>게시판, 일정, 안내 카드, 갤러리성 콘텐츠를 한곳에서 수정합니다.</span>
+          <span>게시판, 일정, 안내 카드, 갤러리성 콘텐츠를 저장소에 바로 반영합니다.</span>
         </div>
         <div class="admin-toolbar-actions">
           <a class="outline-btn" href="index.html">홈 확인</a>
@@ -817,7 +906,8 @@ function renderAdmin() {
           </a>
         `).join("")}
       </div>
-      <p class="admin-note">항목을 추가하거나 수정하면 공개 페이지에 바로 반영됩니다. 현재 저장 방식은 브라우저 저장소이며, 배포 후 전체 공유형 관리가 필요하면 Netlify/Vercel 저장소를 연결하면 됩니다.</p>
+      ${contentLoadError ? `<p class="form-error">${escapeHtml(contentLoadError)}</p>` : ""}
+      <p class="admin-note">항목을 추가하거나 수정하면 Vercel Blob 저장소에 저장되고 공개 페이지가 같은 데이터를 불러옵니다.</p>
       ${ADMIN_SECTIONS.map(renderAdminSection).join("")}
     </section>
   `;
@@ -919,48 +1009,105 @@ function bindFaq() {
 
 function bindAdmin() {
   document.querySelectorAll("[data-admin-login]").forEach((form) => {
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const username = form.querySelector('[name="username"]').value.trim().toUpperCase();
       const password = form.querySelector('[name="password"]').value;
       const error = form.querySelector("[data-admin-error]");
-      if (username === ADMIN_USER && password === ADMIN_PASS) {
-        localStorage.setItem(ADMIN_SESSION_KEY, ADMIN_SESSION_VALUE);
+
+      if (error) error.textContent = "";
+      form.querySelector("button[type='submit']").disabled = true;
+      try {
+        await requestJson(API_ENDPOINTS.login, {
+          method: "POST",
+          body: JSON.stringify({ username, password }),
+        });
         location.href = "admin.html";
-        return;
+      } catch (requestError) {
+        if (error) error.textContent = requestError.message;
+      } finally {
+        form.querySelector("button[type='submit']").disabled = false;
       }
-      if (error) error.textContent = "아이디 또는 비밀번호가 올바르지 않습니다.";
     });
   });
 
-  document.querySelector("[data-admin-logout]")?.addEventListener("click", () => {
-    localStorage.removeItem(ADMIN_SESSION_KEY);
+  document.querySelector("[data-admin-logout]")?.addEventListener("click", async () => {
+    await requestJson(API_ENDPOINTS.logout, { method: "POST", body: "{}" }).catch(() => {});
+    adminSession = false;
     location.href = "admin.html";
   });
 
   document.querySelectorAll("[data-admin-reset]").forEach((button) => {
-    button.addEventListener("click", (event) => {
+    button.addEventListener("click", async (event) => {
       event.preventDefault();
       event.stopPropagation();
       if (!confirm("이 영역을 기본 내용으로 되돌릴까요?")) return;
-      resetCollection(button.dataset.adminReset);
-      location.reload();
+      button.disabled = true;
+      try {
+        await resetCollection(button.dataset.adminReset);
+        location.reload();
+      } catch (error) {
+        alert(error.message);
+        button.disabled = false;
+      }
     });
   });
 
   document.querySelectorAll("[data-admin-delete]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       if (!confirm("이 항목을 삭제할까요?")) return;
       const sectionName = button.dataset.adminDelete;
       const items = loadCollection(sectionName, adminDefaults(sectionName));
       items.splice(Number(button.dataset.index), 1);
-      saveCollection(sectionName, items);
-      location.reload();
+      button.disabled = true;
+      try {
+        await saveCollection(sectionName, items);
+        location.reload();
+      } catch (error) {
+        alert(error.message);
+        button.disabled = false;
+      }
+    });
+  });
+
+  document.querySelectorAll("[data-admin-upload-button]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const form = button.closest("[data-admin-form]");
+      const key = button.dataset.adminUploadButton;
+      const input = form.querySelector(`[data-admin-upload-for="${key}"]`);
+      const target = form.querySelector(`[data-admin-field="${key}"]`);
+      const status = form.querySelector("[data-admin-status]");
+      const file = input?.files?.[0];
+      if (!file) {
+        setAdminStatus(status, "업로드할 이미지를 선택해 주세요.", "error");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+      button.disabled = true;
+      setAdminStatus(status, "이미지를 업로드하는 중입니다.", "info");
+
+      try {
+        const response = await fetch(API_ENDPOINTS.upload, {
+          method: "POST",
+          credentials: "same-origin",
+          body: formData,
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || "이미지 업로드에 실패했습니다.");
+        target.value = result.url;
+        setAdminStatus(status, "이미지 업로드가 완료되었습니다. 저장하기를 눌러 반영하세요.", "success");
+      } catch (error) {
+        setAdminStatus(status, error.message, "error");
+      } finally {
+        button.disabled = false;
+      }
     });
   });
 
   document.querySelectorAll("[data-admin-form]").forEach((form) => {
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const sectionName = form.dataset.adminForm;
       const section = ADMIN_SECTIONS.find((item) => item.name === sectionName);
@@ -989,10 +1136,26 @@ function bindAdmin() {
         items[Number(form.dataset.index)] = nextItem;
       }
 
-      saveCollection(sectionName, items);
-      location.reload();
+      const submit = form.querySelector("button[type='submit']");
+      const status = form.querySelector("[data-admin-status]");
+      submit.disabled = true;
+      setAdminStatus(status, "저장하는 중입니다.", "info");
+      try {
+        await saveCollection(sectionName, items);
+        setAdminStatus(status, "저장되었습니다.", "success");
+        location.reload();
+      } catch (error) {
+        setAdminStatus(status, error.message, "error");
+        submit.disabled = false;
+      }
     });
   });
+}
+
+function setAdminStatus(target, message, type) {
+  if (!target) return;
+  target.textContent = message;
+  target.dataset.status = type || "info";
 }
 
 function bindFilters() {
@@ -1119,10 +1282,18 @@ function bindProductScrollbar() {
   });
 }
 
-function init() {
+function renderCurrentPage() {
   const renderer = renderers[pageId()] || renderers.home;
   renderLayout(renderer());
   bindEvents();
+}
+
+async function init() {
+  await loadRemoteContent();
+  if (pageId() === "admin") {
+    await checkAdminSession();
+  }
+  renderCurrentPage();
 }
 
 init();
