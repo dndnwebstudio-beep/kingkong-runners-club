@@ -17,7 +17,8 @@ const navItems = [
 const defaultProducts = [
   {
     id: "notice-0601",
-    name: "6월 정기 러닝 모임 일정 안내",
+    source: "러닝일정",
+    name: "주1회 정기런",
     price: "매주 토요일 오전 7시",
     image: "picture/20260426_072346.jpg",
     type: "notice",
@@ -27,18 +28,20 @@ const defaultProducts = [
   },
   {
     id: "guide-2026",
-    name: "킹콩 러너스 클럽 신규 회원 가입 안내",
+    source: "공지사항",
+    name: "신규 회원 가입 안내",
     price: "상시 모집",
     image: "picture/20260314_074610.jpg",
     type: "guide",
-    href: "notice.html?id=0",
+    href: "register.html",
     date: "2026.05.28",
-    summary: "처음 달리는 러너도 환영합니다. 가입 절차, 준비물, 오픈채팅 참여 방법을 안내합니다.",
+    summary: "처음 달리는 러너도 환영합니다. 가입문의폼을 남기면 운영진이 참여 방법을 안내합니다.",
   },
   {
     id: "instagram",
-    name: "킹콩 러너스 클럽 인스타그램",
-    price: "팔로우하세요.",
+    source: "소셜",
+    name: "인스타그램",
+    price: "현장 사진과 후기",
     image: "picture/20260426_093654.jpg",
     type: "channel",
     href: "https://www.instagram.com/kingkongrunnersclub/",
@@ -47,6 +50,7 @@ const defaultProducts = [
   },
   {
     id: "challenge-5k",
+    source: "공지사항",
     name: "초보 러너 5K 챌린지 프로그램 모집",
     price: "6월 시작",
     image: "picture/20260329_072115.jpg",
@@ -57,7 +61,8 @@ const defaultProducts = [
   },
   {
     id: "kakao",
-    name: "킹콩 러너스 카카오 채널",
+    source: "문의",
+    name: "카카오 채널",
     price: "공지 알림",
     image: "picture/1777181388630.jpg",
     type: "channel",
@@ -101,6 +106,64 @@ const defaultMagazines = [
   { title: "정기런 전날 체크리스트", image: "picture/20260426_093301(0).jpg", description: "편하게 참여하기 위한 준비와 현장 이야기를 담았습니다." },
 ];
 
+const defaultHomeMedia = [
+  {
+    id: "hero-1",
+    position: "hero",
+    kind: "video",
+    src: "video/hero.mp4",
+    poster: "picture/20260426_072346.jpg",
+    href: "",
+    title: "",
+    text: "",
+    alt: "KINGKONG RUNNERS CLUB hero video",
+  },
+  {
+    id: "hero-2",
+    position: "hero",
+    kind: "video",
+    src: "video/hero2.mp4",
+    poster: "picture/20260329_072318.jpg",
+    href: "",
+    title: "",
+    text: "",
+    alt: "KINGKONG RUNNERS CLUB group running video",
+  },
+  {
+    id: "split-run-log",
+    position: "split",
+    kind: "image",
+    src: "picture/20251017_180003.jpg",
+    poster: "",
+    href: "calendar.html",
+    title: "KINGKONG\nWeekly Run Log",
+    text: "정기런 일정과 모임 기록을 한눈에 확인!",
+    alt: "정기런 일정 배너",
+  },
+  {
+    id: "split-instagram",
+    position: "split",
+    kind: "image",
+    src: "picture/20260426_093721.jpg",
+    poster: "",
+    href: "https://www.instagram.com/kingkongrunnersclub/",
+    title: "",
+    text: "",
+    alt: "킹콩 러너스 클럽 인스타그램",
+  },
+  {
+    id: "feature-magazine",
+    position: "feature",
+    kind: "image",
+    src: "picture/20251123_104709.jpg",
+    poster: "",
+    href: "magazine.html",
+    title: "KINGKONG Magazine\n킹콩 러너스 클럽의 현장 사진과 이야기",
+    text: "",
+    alt: "킹콩매거진",
+  },
+];
+
 const PRODUCT_IMAGE_FALLBACK = "picture/1777181388630.jpg";
 const DEFAULT_PRODUCT_IMAGES = {
   "notice-0601": "picture/20260426_072346.jpg",
@@ -109,9 +172,35 @@ const DEFAULT_PRODUCT_IMAGES = {
   "challenge-5k": "picture/20260329_072115.jpg",
   kakao: "picture/1777181388630.jpg",
 };
+const DEFAULT_PRODUCT_SOURCES = {
+  "notice-0601": "러닝일정",
+  "guide-2026": "공지사항",
+  instagram: "소셜",
+  "challenge-5k": "공지사항",
+  kakao: "문의",
+};
+const DEFAULT_PRODUCT_COPY = Object.fromEntries(
+  defaultProducts.map(({ id, source, name, price, summary }) => [id, { source, name, price, summary }])
+);
+const LEGACY_PRODUCT_COPY = {
+  "notice-0601": {
+    names: ["6월 정기 러닝 모임 일정 안내"],
+  },
+  "guide-2026": {
+    names: ["킹콩 러너스 클럽 신규 회원 가입 안내"],
+    hrefs: ["notice.html?id=0"],
+  },
+  instagram: {
+    names: ["킹콩 러너스 클럽 인스타그램"],
+    prices: ["팔로우하세요."],
+  },
+  kakao: {
+    names: ["킹콩 러너스 카카오 채널"],
+  },
+};
 const DEFAULT_PRODUCT_LINKS = {
   "notice-0601": "calendar.html",
-  "guide-2026": "notice.html?id=0",
+  "guide-2026": "register.html",
   instagram: "https://www.instagram.com/kingkongrunnersclub/",
   "challenge-5k": "notice.html?id=2",
   kakao: "faq.html",
@@ -120,6 +209,7 @@ const DEFAULT_PRODUCT_LINKS = {
 const HAS_API = location.protocol !== "file:";
 const API_ENDPOINTS = {
   content: "/api/content",
+  inquiries: "/api/inquiries",
   login: "/api/admin/login",
   logout: "/api/admin/logout",
   session: "/api/admin/session",
@@ -132,6 +222,8 @@ const defaultContent = {
   runnersVoice: defaultRunnersVoice,
   schedules: defaultSchedules,
   magazines: defaultMagazines,
+  homeMedia: defaultHomeMedia,
+  inquiries: [],
 };
 
 let siteContent = cloneData(defaultContent);
@@ -141,6 +233,8 @@ let newsletters = siteContent.newsletters;
 let runnersVoice = siteContent.runnersVoice;
 let schedules = siteContent.schedules;
 let magazines = siteContent.magazines;
+let homeMedia = siteContent.homeMedia;
+let inquiries = siteContent.inquiries;
 let adminSession = false;
 let contentLoadError = "";
 
@@ -156,14 +250,38 @@ function migrateProductImages(items) {
   return items.map((item) => {
     if (!item || typeof item !== "object") return item;
     const currentImage = item.image || "";
+    const defaultCopy = DEFAULT_PRODUCT_COPY[item.id] || {};
+    const legacyCopy = LEGACY_PRODUCT_COPY[item.id] || {};
     return {
       ...item,
+      source: item.source || defaultCopy.source || DEFAULT_PRODUCT_SOURCES[item.id] || "홈",
+      name: !item.name || legacyCopy.names?.includes(item.name) ? defaultCopy.name || item.name : item.name,
+      price: !item.price || legacyCopy.prices?.includes(item.price) ? defaultCopy.price || item.price : item.price,
+      summary: item.summary || defaultCopy.summary || "",
       image: isExternalAsset(currentImage) || currentImage.startsWith("picture/")
         ? currentImage
         : DEFAULT_PRODUCT_IMAGES[item.id] || PRODUCT_IMAGE_FALLBACK,
-      href: item.href || DEFAULT_PRODUCT_LINKS[item.id] || `product.html?id=${encodeURIComponent(item.id || "")}`,
+      href: !item.href || legacyCopy.hrefs?.includes(item.href)
+        ? DEFAULT_PRODUCT_LINKS[item.id] || `product.html?id=${encodeURIComponent(item.id || "")}`
+        : item.href,
     };
   });
+}
+
+function normalizeHomeMedia(items) {
+  return items
+    .filter((item) => item && typeof item === "object")
+    .map((item, index) => ({
+      id: item.id || `media-${index + 1}`,
+      position: item.position || "split",
+      kind: item.kind || (String(item.src || "").match(/\.(mp4|webm|mov)(\?|#|$)/i) ? "video" : "image"),
+      src: item.src || "",
+      poster: item.poster || "",
+      href: item.href || "",
+      title: item.title || "",
+      text: item.text || "",
+      alt: item.alt || "",
+    }));
 }
 
 function normalizeMagazines(items) {
@@ -186,6 +304,8 @@ function applySiteContent(content) {
     runnersVoice: Array.isArray(source.runnersVoice) ? source.runnersVoice : defaultRunnersVoice,
     schedules: Array.isArray(source.schedules) ? source.schedules : defaultSchedules,
     magazines: normalizeMagazines(source.magazines),
+    homeMedia: normalizeHomeMedia(Array.isArray(source.homeMedia) ? source.homeMedia : defaultHomeMedia),
+    inquiries: Array.isArray(source.inquiries) ? source.inquiries : [],
   };
   products = siteContent.products;
   notices = siteContent.notices;
@@ -193,6 +313,8 @@ function applySiteContent(content) {
   runnersVoice = siteContent.runnersVoice;
   schedules = siteContent.schedules;
   magazines = siteContent.magazines;
+  homeMedia = siteContent.homeMedia;
+  inquiries = siteContent.inquiries;
 }
 
 function loadCollection(name, fallback) {
@@ -342,6 +464,7 @@ function renderFooter() {
           <strong>@킹콩러너스클럽</strong>
         </div>
         <ul class="footer-links">
+          <li><a href="register.html">가입문의</a></li>
           <li><a href="faq.html">FAQ</a></li>
           <li><a href="agreement.html">이용약관</a></li>
           <li><a href="privacy.html">개인정보처리방침</a></li>
@@ -351,6 +474,118 @@ function renderFooter() {
         </ul>
       </div>
     </footer>
+  `;
+}
+
+function formatLines(value) {
+  return escapeHtml(value).replace(/\n/g, "<br>");
+}
+
+function mediaAsset(item) {
+  if (!item?.src) return "";
+  return asset(item.src);
+}
+
+function mediaPoster(item) {
+  if (!item?.poster) return "";
+  return asset(item.poster);
+}
+
+function mediaIsVideo(item) {
+  return item?.kind === "video" || String(item?.src || "").match(/\.(mp4|webm|mov)(\?|#|$)/i);
+}
+
+function mediaMimeType(item) {
+  const src = String(item?.src || "");
+  if (/\.webm(\?|#|$)/i.test(src)) return "video/webm";
+  if (/\.mov(\?|#|$)/i.test(src)) return "video/quicktime";
+  return "video/mp4";
+}
+
+function linkAttrs(href) {
+  if (!href) return "";
+  const external = /^https?:\/\//i.test(href);
+  return ` href="${escapeHtml(href)}"${external ? ` target="_blank" rel="noreferrer"` : ""}`;
+}
+
+function renderMediaAsset(item, className = "") {
+  const src = mediaAsset(item);
+  if (!src) return "";
+  const classAttr = className ? ` class="${className}"` : "";
+  if (mediaIsVideo(item)) {
+    const poster = mediaPoster(item);
+    return `
+      <video${classAttr} autoplay muted loop playsinline preload="metadata"${poster ? ` poster="${escapeHtml(poster)}"` : ""} aria-label="${escapeHtml(item.alt || item.title || "킹콩 러너스 클럽 영상")}">
+        <source src="${escapeHtml(src)}" type="${mediaMimeType(item)}">
+      </video>
+    `;
+  }
+  return `<img${classAttr} src="${escapeHtml(src)}" alt="${escapeHtml(item.alt || item.title || "")}">`;
+}
+
+function homeMediaByPosition(position) {
+  return homeMedia.filter((item) => item.position === position && item.src);
+}
+
+function renderHeroMedia() {
+  const slides = homeMediaByPosition("hero");
+  if (!slides.length) return "";
+
+  return `
+    <section class="hero-slider" data-hero-slider>
+      <div class="hero-track">
+        ${slides.map((item) => `<div class="hero-slide">${renderMediaAsset(item)}</div>`).join("")}
+      </div>
+      ${slides.length > 1 ? `<div class="hero-pagination"><span data-hero-current>01</span> / <span>${String(slides.length).padStart(2, "0")}</span></div>` : ""}
+      <div class="hero-cta">
+        <span>처음이어도 괜찮아요. 함께 달릴 준비만 해오세요.</span>
+        <div class="cta-actions">
+          <a class="primary-btn cta-dark" href="register.html">지금 함께 달리기</a>
+          <a class="outline-btn cta-light" href="register.html">가입하기</a>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderSplitMedia() {
+  const items = homeMediaByPosition("split");
+  if (!items.length) return "";
+
+  return `
+    <section class="split-banners ${items.length === 1 ? "is-single" : ""}">
+      ${items.map((item) => {
+        const hasCopy = item.title || item.text;
+        const content = `
+          ${renderMediaAsset(item)}
+          ${hasCopy ? `
+            <div class="banner-copy">
+              ${item.title ? `<h2>${formatLines(item.title)}</h2>` : ""}
+              ${item.text ? `<p>${escapeHtml(item.text)}</p>` : ""}
+              ${item.href ? `<span class="text-link">VIEW MORE</span>` : ""}
+            </div>
+          ` : ""}
+        `;
+        return item.href
+          ? `<a class="split-banner ${hasCopy ? "has-copy" : ""}"${linkAttrs(item.href)}>${content}</a>`
+          : `<div class="split-banner ${hasCopy ? "has-copy" : ""}">${content}</div>`;
+      }).join("")}
+    </section>
+  `;
+}
+
+function renderFeatureMedia() {
+  const item = homeMediaByPosition("feature")[0];
+  if (!item) return "";
+  const title = item.title || "킹콩매거진";
+  const content = `
+    ${renderMediaAsset(item)}
+    <span>${formatLines(title)}</span>
+  `;
+  return `
+    <section class="board-banners is-single">
+      ${item.href ? `<a class="board-tile"${linkAttrs(item.href)}>${content}</a>` : `<div class="board-tile">${content}</div>`}
+    </section>
   `;
 }
 
@@ -365,6 +600,7 @@ function productCard(product) {
           <img src="${escapeHtml(asset(product.image))}" alt="">
         </span>
         <span class="product-info">
+          <span class="product-source">${escapeHtml(product.source || "홈")}</span>
           <span class="product-name">${escapeHtml(product.name)}</span>
           <span class="product-price">${escapeHtml(product.price)}</span>
         </span>
@@ -375,21 +611,7 @@ function productCard(product) {
 
 function renderHome() {
   return `
-    <section class="hero-slider" data-hero-slider>
-      <div class="hero-track">
-        <div class="hero-slide">
-          <video autoplay muted loop playsinline preload="metadata" poster="${asset("picture/20260426_072346.jpg")}" aria-label="KINGKONG RUNNERS CLUB hero video">
-            <source src="${asset("video/hero.mp4")}" type="video/mp4">
-          </video>
-        </div>
-        <div class="hero-slide">
-          <video autoplay muted loop playsinline preload="metadata" poster="${asset("picture/20260329_072318.jpg")}" aria-label="KINGKONG RUNNERS CLUB group running video">
-            <source src="${asset("video/hero2.mp4")}" type="video/mp4">
-          </video>
-        </div>
-      </div>
-      <div class="hero-pagination"><span data-hero-current>01</span> / <span>02</span></div>
-    </section>
+    ${renderHeroMedia()}
 
     <section class="section product-strip container">
       <div class="product-track">
@@ -400,19 +622,16 @@ function renderHome() {
       </div>
     </section>
 
-    <section class="split-banners">
-      <a class="split-banner has-copy" href="calendar.html">
-        <img src="${asset("picture/20251017_180003.jpg")}" alt="">
-        <div class="banner-copy">
-          <h2>KINGKONG<br>Weekly Run Log</h2>
-          <p>정기런 일정과 모임 기록을 한눈에 확인!</p>
-          <span class="text-link">VIEW MORE</span>
-        </div>
-      </a>
-      <a class="split-banner" href="https://www.instagram.com/kingkongrunnersclub/" target="_blank" rel="noreferrer">
-        <img src="${asset("picture/20260426_093721.jpg")}" alt="킹콩 러너스 클럽 인스타그램">
-      </a>
+    <section class="cta-band">
+      <div>
+        <span>JOIN KINGKONG RUNNERS</span>
+        <h2>주1회 정기런부터 가볍게 시작해요.</h2>
+        <p>가입 문의를 남겨주시면 운영진이 정기런 참여 방법과 준비물을 안내합니다.</p>
+      </div>
+      <a class="primary-btn" href="register.html">가입문의 남기기</a>
     </section>
+
+    ${renderSplitMedia()}
 
     <section class="news-section">
       <div class="news-left">
@@ -424,12 +643,7 @@ function renderHome() {
       <div class="news-list" data-news-list>${renderNewsList(newsletters)}</div>
     </section>
 
-    <section class="board-banners is-single">
-      <a class="board-tile" href="magazine.html">
-        <img src="${asset("picture/20251123_104709.jpg")}" alt="킹콩매거진">
-        <span>KINGKONG Magazine<br>킹콩 러너스 클럽의 현장 사진과 이야기</span>
-      </a>
-    </section>
+    ${renderFeatureMedia()}
   `;
 }
 
@@ -463,6 +677,10 @@ function renderBrand() {
           <div class="stat"><strong>SAT</strong><span>주1회 정기런</span></div>
           <div class="stat"><strong>슬로우·패스트</strong><span>트랙 운영</span></div>
           <div class="stat"><strong>OPEN</strong><span>신규 회원 환영</span></div>
+        </div>
+        <div class="join-guide-actions">
+          <a class="primary-btn" href="register.html">지금 함께 달리기</a>
+          <a class="outline-btn" href="calendar.html">러닝일정 보기</a>
         </div>
       </div>
     </section>
@@ -507,7 +725,10 @@ function renderCalendar() {
       <div class="calendar-box">
         <div class="calendar-head">
           <h2>${year}.${String(month).padStart(2, "0")}</h2>
-          <a class="outline-btn" href="notice.html">공지사항</a>
+          <div class="calendar-actions">
+            <a class="primary-btn" href="register.html">가입하기</a>
+            <a class="outline-btn" href="notice.html">공지사항</a>
+          </div>
         </div>
         <div class="calendar-grid">
           ${days.map((day) => `<span>${day}</span>`).join("")}
@@ -528,27 +749,52 @@ function renderCalendar() {
 }
 
 function renderRegister() {
-  const joinNoticeIndex = notices.findIndex((notice) => String(notice[1] || "").includes("가입"));
-  const noticeIndex = joinNoticeIndex >= 0 ? joinNoticeIndex : 0;
-  const joinNotice = notices[noticeIndex] || defaultNotices[0];
-
   return `
-    ${pageTitle("가입안내", "가입 관련 내용은 공지사항 게시글로 관리합니다.")}
-    <section class="section narrow">
-      <article class="notice-detail join-guide-card">
-        <div class="notice-detail-meta"><span>가입안내</span><span>${joinNotice[3]}</span></div>
-        <h2>${escapeHtml(joinNotice[1])}</h2>
-        <p>${escapeHtml(joinNotice[4])}</p>
-        <div class="join-guide-actions">
-          <a class="primary-btn" href="notice.html?id=${noticeIndex}">가입 공지 자세히 보기</a>
-          <a class="outline-btn" href="notice.html">전체 공지사항</a>
+    ${pageTitle("가입문의", "함께 달리고 싶은 마음을 간단히 남겨주세요. 운영진이 확인 후 안내합니다.")}
+    <section class="section narrow inquiry-layout">
+      <aside class="inquiry-copy">
+        <span>JOIN KINGKONG</span>
+        <h2>처음 달리는 분도, 기록을 다시 만들고 싶은 분도 환영합니다.</h2>
+        <p>정기런 참여 가능 횟수와 러닝 경험을 남겨주시면 페이스와 모임 안내를 더 편하게 도와드릴 수 있습니다.</p>
+        <div class="inquiry-points">
+          <strong>접수 후 안내</strong>
+          <strong>주1회 정기런</strong>
+          <strong>슬로우·패스트 트랙</strong>
         </div>
-      </article>
-      <div class="section-title notice-list-title">
-        <h2>가입 관련 공지</h2>
-        <p>가입 안내, 정기런 참여 방법, 운영 공지는 공지사항에서 함께 관리합니다.</p>
-      </div>
-      ${boardTable(notices)}
+      </aside>
+      <form class="inquiry-form" data-inquiry-form>
+        <div class="form-grid">
+          <label>이름<input required name="name" type="text" autocomplete="name" placeholder="홍길동"></label>
+          <label>전화번호<input required name="phone" type="tel" autocomplete="tel" placeholder="010-0000-0000"></label>
+          <label class="full">가입 이유<textarea required name="reason" placeholder="킹콩 러너스 클럽에 함께하고 싶은 이유를 알려주세요."></textarea></label>
+          <label>가입 경로
+            <select name="source">
+              <option value="인스타그램">인스타그램</option>
+              <option value="지인 추천">지인 추천</option>
+              <option value="검색">검색</option>
+              <option value="카카오채널">카카오채널</option>
+              <option value="기타">기타</option>
+            </select>
+          </label>
+          <label>추천인<input name="referrer" type="text" placeholder="추천인이 있다면 입력"></label>
+          <label>주 몇 회 운동 가능
+            <select name="availability">
+              <option value="주 1회">주 1회</option>
+              <option value="주 2회">주 2회</option>
+              <option value="주 3회 이상">주 3회 이상</option>
+              <option value="아직 미정">아직 미정</option>
+            </select>
+          </label>
+          <label>대회 기록<input name="raceRecord" type="text" placeholder="예: 10K 55분, 첫 대회 준비 중"></label>
+          <label class="full">하고 싶은 말<textarea name="message" placeholder="궁금한 점이나 운영진에게 전하고 싶은 말을 남겨주세요."></textarea></label>
+        </div>
+        <label class="agreement-check">
+          <input required type="checkbox" name="privacy">
+          <span>가입 안내를 위해 입력한 연락처와 문의 내용을 관리자에게 전달하는 데 동의합니다.</span>
+        </label>
+        <p class="form-status" data-inquiry-status></p>
+        <button class="primary-btn" type="submit">가입문의 보내기</button>
+      </form>
     </section>
   `;
 }
@@ -742,6 +988,61 @@ function legalPage(title, sections) {
 
 const ADMIN_SECTIONS = [
   {
+    name: "homeMedia",
+    title: "홈 미디어",
+    description: "히어로 영상, 중간 배너, 하단 매거진 배너의 사진/영상을 관리합니다.",
+    publicHref: "index.html",
+    kind: "object",
+    fields: [
+      { key: "id", label: "ID", placeholder: "hero-1" },
+      { key: "position", label: "영역", options: [["hero", "히어로 영상"], ["split", "중간 배너"], ["feature", "하단 배너"]] },
+      { key: "kind", label: "파일 종류", options: [["image", "사진"], ["video", "영상"]] },
+      { key: "src", label: "사진/영상 URL", placeholder: "picture/example.jpg 또는 video/example.mp4", upload: true, accept: "image/*,video/*" },
+      { key: "poster", label: "영상 포스터 URL", placeholder: "picture/poster.jpg", upload: true, accept: "image/*" },
+      { key: "href", label: "링크", placeholder: "calendar.html" },
+      { key: "title", label: "제목", placeholder: "배너 제목", multiline: true },
+      { key: "text", label: "설명", placeholder: "배너 설명", multiline: true },
+      { key: "alt", label: "대체 텍스트", placeholder: "이미지 설명" },
+    ],
+  },
+  {
+    name: "products",
+    title: "홈 주요 카드",
+    description: "히어로 아래 가로 카드의 출처, 제목, 링크, 사진을 관리합니다.",
+    publicHref: "index.html",
+    kind: "object",
+    fields: [
+      { key: "id", label: "ID", placeholder: "schedule-card" },
+      { key: "source", label: "출처 라벨", placeholder: "러닝일정 / 공지사항 / 킹콩매거진" },
+      { key: "name", label: "제목", placeholder: "주1회 정기런" },
+      { key: "price", label: "보조 문구", placeholder: "매주 토요일 오전 7시" },
+      { key: "image", label: "사진 URL", placeholder: "picture/20260426_072346.jpg", upload: true, accept: "image/*" },
+      { key: "href", label: "연결 링크", placeholder: "calendar.html" },
+      { key: "summary", label: "관리 메모", placeholder: "카드 설명", multiline: true },
+    ],
+  },
+  {
+    name: "inquiries",
+    title: "가입문의",
+    description: "가입문의폼에서 접수된 러너 정보를 확인하고 상태를 관리합니다.",
+    publicHref: "register.html",
+    kind: "object",
+    noAdd: true,
+    noReset: true,
+    fields: [
+      { key: "status", label: "상태", options: [["신규", "신규"], ["확인", "확인"], ["연락완료", "연락완료"], ["보류", "보류"]] },
+      { key: "createdAt", label: "접수일", placeholder: "2026-05-28T00:00:00.000Z" },
+      { key: "name", label: "이름", placeholder: "홍길동" },
+      { key: "phone", label: "전화번호", placeholder: "010-0000-0000" },
+      { key: "reason", label: "가입 이유", placeholder: "가입 이유", multiline: true },
+      { key: "source", label: "가입 경로", placeholder: "인스타그램" },
+      { key: "referrer", label: "추천인", placeholder: "추천인" },
+      { key: "availability", label: "운동 가능 횟수", placeholder: "주 1회" },
+      { key: "raceRecord", label: "대회 기록", placeholder: "10K 55분" },
+      { key: "message", label: "하고 싶은 말", placeholder: "문의 내용", multiline: true },
+    ],
+  },
+  {
     name: "notices",
     title: "공지사항 / 가입안내",
     description: "가입안내, 정기런 공지, 운영 공지를 모두 게시글로 관리합니다.",
@@ -803,6 +1104,8 @@ function adminDefaults(name) {
     runnersVoice: defaultRunnersVoice,
     schedules: defaultSchedules,
     magazines: defaultMagazines,
+    homeMedia: defaultHomeMedia,
+    inquiries: [],
   }[name];
 }
 
@@ -814,6 +1117,8 @@ function adminData(name) {
     runnersVoice,
     schedules,
     magazines,
+    homeMedia,
+    inquiries,
   }[name];
 }
 
@@ -838,13 +1143,24 @@ function renderAdminField(field, item) {
   if (field.multiline) {
     return `<label>${label}<textarea data-admin-field="${field.key}" placeholder="${escapeHtml(field.placeholder || "")}">${value}</textarea></label>`;
   }
+  if (field.options) {
+    return `
+      <label>
+        ${label}
+        <select data-admin-field="${field.key}">
+          ${field.options.map(([optionValue, optionLabel]) => `<option value="${escapeHtml(optionValue)}"${String(value) === optionValue ? " selected" : ""}>${escapeHtml(optionLabel)}</option>`).join("")}
+        </select>
+      </label>
+    `;
+  }
   if (field.upload) {
+    const accept = field.accept || "image/*";
     return `
       <label class="admin-upload-field">
         ${label}
         <span class="admin-upload-row">
           <input data-admin-field="${field.key}" type="text" value="${value}" placeholder="${escapeHtml(field.placeholder || "")}">
-          <input data-admin-upload-for="${field.key}" type="file" accept="image/*">
+          <input data-admin-upload-for="${field.key}" type="file" accept="${escapeHtml(accept)}">
           <button class="outline-btn" type="button" data-admin-upload-button="${field.key}">업로드</button>
         </span>
       </label>
@@ -873,18 +1189,18 @@ function renderAdminForm(section, item, index) {
 function renderAdminSection(section) {
   const items = adminData(section.name);
   return `
-    <details class="admin-section" id="admin-${section.name}" ${section.name === "notices" ? "open" : ""}>
+    <details class="admin-section" id="admin-${section.name}" ${section.name === "homeMedia" ? "open" : ""}>
       <summary>
         <span><strong>${section.title}</strong><em>${items.length}개 항목 · ${section.description}</em></span>
       </summary>
       <div class="admin-section-body">
         <div class="admin-section-tools">
           <a class="outline-btn" href="${section.publicHref || "index.html"}">공개 화면 보기</a>
-          <button class="outline-btn" type="button" data-admin-reset="${section.name}">기본값 복원</button>
+          ${section.noReset ? "" : `<button class="outline-btn" type="button" data-admin-reset="${section.name}">기본값 복원</button>`}
         </div>
-        ${section.fixed ? "" : renderAdminForm(section, null, "new")}
+        ${section.fixed || section.noAdd ? "" : renderAdminForm(section, null, "new")}
         <div class="admin-current-list">
-          ${items.map((item, index) => renderAdminForm(section, item, index)).join("")}
+          ${items.length ? items.map((item, index) => renderAdminForm(section, item, index)).join("") : `<p class="admin-empty">아직 접수된 항목이 없습니다.</p>`}
         </div>
       </div>
     </details>
@@ -893,7 +1209,7 @@ function renderAdminSection(section) {
 
 function renderAdminLogin() {
   return `
-    ${pageTitle("ADMIN", "관리자 로그인 후 공지사항, 일정, 갤러리, 뉴스 콘텐츠를 수정할 수 있습니다.")}
+    ${pageTitle("ADMIN", "관리자 로그인 후 가입문의, 홈 미디어, 공지사항, 일정, 갤러리, 뉴스 콘텐츠를 관리할 수 있습니다.")}
     <section class="section">
       <form class="auth-box" data-admin-login>
         <label>아이디<input required type="text" name="username" autocomplete="username"></label>
@@ -917,7 +1233,7 @@ function renderAdmin() {
       <div class="admin-toolbar">
         <div>
           <strong>관리자 모드</strong>
-          <span>가입안내는 공지사항 글로 관리하고, 갤러리와 뉴스는 각각의 영역에서 수정합니다.</span>
+          <span>가입문의는 접수 목록에서 확인하고, 홈 사진/영상과 주요 카드는 별도 영역에서 관리합니다.</span>
         </div>
         <div class="admin-toolbar-actions">
           <a class="outline-btn" href="index.html">홈 확인</a>
@@ -934,7 +1250,7 @@ function renderAdmin() {
         `).join("")}
       </div>
       ${contentLoadError ? `<p class="form-error">${escapeHtml(contentLoadError)}</p>` : ""}
-      <p class="admin-note">가입안내 글은 공지사항 / 가입안내에서 작성하세요. 저장하면 Vercel Blob 저장소에 반영되고 공개 페이지가 같은 데이터를 불러옵니다.</p>
+      <p class="admin-note">가입문의는 공개 폼에서 자동 접수됩니다. 홈 미디어의 영역 값은 hero, split, feature를 사용하며 저장하면 Vercel Blob 저장소에 반영됩니다.</p>
       ${ADMIN_SECTIONS.map(renderAdminSection).join("")}
     </section>
   `;
@@ -1001,6 +1317,7 @@ function bindEvents() {
   bindLinkNavigation();
   bindDragScroll();
   bindProductScrollbar();
+  bindInquiryForm();
 }
 
 function bindSliders() {
@@ -1009,10 +1326,12 @@ function bindSliders() {
     let index = 0;
     const track = hero.querySelector(".hero-track");
     const current = hero.querySelector("[data-hero-current]");
+    const slides = hero.querySelectorAll(".hero-slide");
+    if (!track || !current || slides.length < 2) return;
     setInterval(() => {
-      index = (index + 1) % 2;
+      index = (index + 1) % slides.length;
       track.style.transform = `translateX(-${index * 100}%)`;
-      current.textContent = `0${index + 1}`;
+      current.textContent = String(index + 1).padStart(2, "0");
     }, 4800);
   }
 }
@@ -1138,14 +1457,14 @@ function bindAdminCollectionControls(scope = document) {
       const status = form.querySelector("[data-admin-status]");
       const file = input?.files?.[0];
       if (!file) {
-        setAdminStatus(status, "업로드할 이미지를 선택해 주세요.", "error");
+        setAdminStatus(status, "업로드할 파일을 선택해 주세요.", "error");
         return;
       }
 
       const formData = new FormData();
       formData.append("file", file);
       button.disabled = true;
-      setAdminStatus(status, "이미지를 업로드하는 중입니다.", "info");
+      setAdminStatus(status, "파일을 업로드하는 중입니다.", "info");
 
       try {
         const response = await fetch(API_ENDPOINTS.upload, {
@@ -1154,9 +1473,9 @@ function bindAdminCollectionControls(scope = document) {
           body: formData,
         });
         const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error || "이미지 업로드에 실패했습니다.");
+        if (!response.ok) throw new Error(result.error || "파일 업로드에 실패했습니다.");
         target.value = result.url;
-        setAdminStatus(status, "이미지 업로드가 완료되었습니다. 저장하기를 눌러 반영하세요.", "success");
+        setAdminStatus(status, "업로드가 완료되었습니다. 저장하기를 눌러 반영하세요.", "success");
       } catch (error) {
         setAdminStatus(status, error.message, "error");
       } finally {
@@ -1171,7 +1490,9 @@ function bindAdminCollectionControls(scope = document) {
       const sectionName = form.dataset.adminForm;
       const section = ADMIN_SECTIONS.find((item) => item.name === sectionName);
       const items = loadCollection(sectionName, adminDefaults(sectionName));
-      const nextItem = section.kind === "array" ? [] : {};
+      const itemIndex = Number(form.dataset.index);
+      const originalItem = form.dataset.index === "new" ? null : items[itemIndex];
+      const nextItem = section.kind === "array" ? [] : { ...(originalItem || {}) };
 
       section.fields.forEach((field) => {
         const control = form.querySelector(`[data-admin-field="${field.key}"]`);
@@ -1183,10 +1504,23 @@ function bindAdminCollectionControls(scope = document) {
         }
       });
 
+      if (sectionName === "products") {
+        if (!nextItem.id) nextItem.id = `card-${Date.now()}`;
+        if (!nextItem.source) nextItem.source = "홈";
+        if (!nextItem.image) nextItem.image = PRODUCT_IMAGE_FALLBACK;
+        if (!nextItem.href) nextItem.href = "notice.html";
+      }
+
+      if (sectionName === "homeMedia") {
+        if (!nextItem.id) nextItem.id = `media-${Date.now()}`;
+        if (!nextItem.position) nextItem.position = "split";
+        if (!nextItem.kind) nextItem.kind = String(nextItem.src || "").match(/\.(mp4|webm|mov)(\?|#|$)/i) ? "video" : "image";
+      }
+
       if (form.dataset.index === "new") {
         items.unshift(nextItem);
       } else {
-        items[Number(form.dataset.index)] = nextItem;
+        items[itemIndex] = nextItem;
       }
 
       const submit = form.querySelector("button[type='submit']");
@@ -1393,6 +1727,33 @@ function bindProductScrollbar() {
   });
 }
 
+function bindInquiryForm() {
+  document.querySelectorAll("[data-inquiry-form]").forEach((form) => {
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const status = form.querySelector("[data-inquiry-status]");
+      const submit = form.querySelector("button[type='submit']");
+      const data = Object.fromEntries(new FormData(form).entries());
+
+      submit.disabled = true;
+      setAdminStatus(status, "가입문의를 접수하는 중입니다.", "info");
+
+      try {
+        await requestJson(API_ENDPOINTS.inquiries, {
+          method: "POST",
+          body: JSON.stringify(data),
+        });
+        form.reset();
+        setAdminStatus(status, "가입문의가 접수되었습니다. 운영진이 확인 후 안내드릴게요.", "success");
+      } catch (error) {
+        setAdminStatus(status, error.message, "error");
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  });
+}
+
 function renderCurrentPage() {
   const renderer = renderers[pageId()] || renderers.home;
   renderLayout(renderer());
@@ -1400,10 +1761,10 @@ function renderCurrentPage() {
 }
 
 async function init() {
-  await loadRemoteContent();
   if (pageId() === "admin") {
     await checkAdminSession();
   }
+  await loadRemoteContent();
   renderCurrentPage();
 }
 

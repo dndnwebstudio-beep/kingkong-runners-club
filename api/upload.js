@@ -24,7 +24,7 @@ module.exports = async function handler(req, res) {
     }
 
     const form = formidable({
-      maxFileSize: 20 * 1024 * 1024,
+      maxFileSize: 100 * 1024 * 1024,
       multiples: false,
     });
     const [, files] = await form.parse(req);

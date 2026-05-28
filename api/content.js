@@ -5,7 +5,9 @@ const { readContent, updateSection, writeContent } = require("../lib/server/cont
 module.exports = async function handler(req, res) {
   try {
     if (req.method === "GET") {
-      sendJson(res, 200, await readContent());
+      const content = await readContent();
+      if (!verifySession(req)) delete content.inquiries;
+      sendJson(res, 200, content);
       return;
     }
 
