@@ -541,7 +541,6 @@ function renderHeroMedia() {
         <span>처음이어도 괜찮아요. 함께 달릴 준비만 해오세요.</span>
         <div class="cta-actions">
           <a class="primary-btn cta-dark" href="register.html">지금 함께 달리기</a>
-          <a class="outline-btn cta-light" href="register.html">가입하기</a>
         </div>
       </div>
     </section>
@@ -636,9 +635,6 @@ function renderHome() {
     <section class="news-section">
       <div class="news-left">
         <h2>킹콩뉴스 <a href="newsletter.html" aria-label="뉴스 더보기">↗</a></h2>
-        <div class="news-tabs">
-          <button type="button" class="is-active" data-news-tab="newsletter">최신뉴스레터</button>
-        </div>
       </div>
       <div class="news-list" data-news-list>${renderNewsList(newsletters)}</div>
     </section>
