@@ -262,13 +262,6 @@ function renderLayout(content) {
               <img class="icon-light" src="${asset("ic_hd_search.svg")}" alt="">
               <img class="icon-dark" src="${asset("ic_hd_search_b.svg")}" alt="">
             </button>
-            <div class="lang">
-              <button class="lang-current" type="button">KR <img src="${asset("ic_hd_arr_down_b.svg")}" alt=""></button>
-              <div class="lang-menu">
-                <a href="index.html">KR</a>
-                <a href="index.html" lang="en">EN</a>
-              </div>
-            </div>
             <button class="menu-toggle" type="button" aria-label="메뉴 열기" data-menu-toggle>
               <span></span><span></span><span></span>
             </button>

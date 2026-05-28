@@ -228,8 +228,7 @@ button {
 }
 
 .nav-link,
-.util-link,
-.lang-current {
+.util-link {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -240,8 +239,7 @@ button {
 }
 
 .nav-link:hover,
-.util-link:hover,
-.lang-current:hover {
+.util-link:hover {
   color: #66645f;
 }
 
@@ -311,47 +309,6 @@ button {
 
 .home .site-header:not(.scrolled):not(.menu-open):not(.search-open) .icon-light {
   display: block;
-}
-
-.lang {
-  position: relative;
-}
-
-.lang-current {
-  gap: 6px;
-}
-
-.lang-current img {
-  width: 8px;
-  height: 6px;
-}
-
-.lang-menu {
-  position: absolute;
-  top: 42px;
-  right: 0;
-  width: 78px;
-  padding: 8px 0;
-  background: rgba(245, 244, 240, 0.98);
-  border: 1px solid rgba(17, 17, 17, 0.1);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(8px);
-  transition: opacity var(--ease), transform var(--ease);
-}
-
-.lang:hover .lang-menu,
-.lang:focus-within .lang-menu {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-.lang-menu a {
-  display: block;
-  padding: 7px 14px;
-  color: var(--ink);
-  font-size: 14px;
 }
 
 .menu-toggle {
@@ -1841,10 +1798,6 @@ button {
   .search-form,
   .footer-inner {
     width: min(calc(100% - 32px), var(--container));
-  }
-
-  .lang {
-    display: none;
   }
 
   .hero-slide {
