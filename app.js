@@ -89,9 +89,10 @@ const defaultSchedules = [
   { date: "2026.06.27", title: "월말 롱런 데이", place: "도심 순환 코스", note: "15K 선택 코스" },
 ];
 
-const ADMIN_USER = "admin";
-const ADMIN_PASS = "admin";
+const ADMIN_USER = "ADMIN";
+const ADMIN_PASS = "0000";
 const ADMIN_SESSION_KEY = "kingkong-admin-session";
+const ADMIN_SESSION_VALUE = "kingkong-admin-v2";
 const STORE_KEYS = {
   products: "kingkong-admin-products",
   notices: "kingkong-admin-notices",
@@ -150,7 +151,7 @@ function resetCollection(name) {
 }
 
 function isAdminLoggedIn() {
-  return localStorage.getItem(ADMIN_SESSION_KEY) === "true";
+  return localStorage.getItem(ADMIN_SESSION_KEY) === ADMIN_SESSION_VALUE;
 }
 
 function asset(name) {
@@ -313,19 +314,6 @@ function renderHome() {
         </div>
       </div>
       <div class="news-list" data-news-list>${renderNewsList(newsletters)}</div>
-    </section>
-
-    <section class="wide-banner" data-wide-banner>
-      <div class="wide-banner-frame">
-        <div class="wide-banner-track">
-          <a class="wide-banner-slide" href="brand.html"><img src="${asset("picture/20260329_072318.jpg")}" alt="킹콩 러너스 클럽 소개"></a>
-          <a class="wide-banner-slide" href="story.html"><img src="${asset("picture/20260426_075115.jpg")}" alt="킹콩 러너스 클럽 캠페인"></a>
-        </div>
-      </div>
-      <div class="banner-dots">
-        <button type="button" class="is-active" data-wide-dot="0" aria-label="첫 번째 배너"></button>
-        <button type="button" data-wide-dot="1" aria-label="두 번째 배너"></button>
-      </div>
     </section>
 
     <section class="board-banners">
@@ -792,8 +780,8 @@ function renderAdminLogin() {
     ${pageTitle("ADMIN", "관리자 로그인 후 게시판, 러닝일정, 가입안내, 갤러리 콘텐츠를 수정할 수 있습니다.")}
     <section class="section">
       <form class="auth-box" data-admin-login>
-        <label>아이디<input required type="text" name="username" autocomplete="username" placeholder="admin"></label>
-        <label>비밀번호<input required type="password" name="password" autocomplete="current-password" placeholder="admin"></label>
+        <label>아이디<input required type="text" name="username" autocomplete="username"></label>
+        <label>비밀번호<input required type="password" name="password" autocomplete="current-password"></label>
         <p class="form-error" data-admin-error></p>
         <div class="auth-actions">
           <button class="primary-btn" type="submit">관리자 로그인</button>
@@ -812,7 +800,7 @@ function renderAdmin() {
     <section class="section narrow admin-dashboard">
       <div class="admin-toolbar">
         <div>
-          <strong>admin</strong>
+          <strong>관리자 모드</strong>
           <span>게시판, 일정, 안내 카드, 갤러리성 콘텐츠를 한곳에서 수정합니다.</span>
         </div>
         <div class="admin-toolbar-actions">
@@ -908,19 +896,6 @@ function bindSliders() {
       current.textContent = `0${index + 1}`;
     }, 4800);
   }
-
-  const wide = document.querySelector("[data-wide-banner]");
-  if (wide) {
-    const track = wide.querySelector(".wide-banner-track");
-    const dots = [...wide.querySelectorAll("[data-wide-dot]")];
-    dots.forEach((dot) => {
-      dot.addEventListener("click", () => {
-        const index = Number(dot.dataset.wideDot);
-        track.style.transform = `translateX(-${index * 100}%)`;
-        dots.forEach((item) => item.classList.toggle("is-active", item === dot));
-      });
-    });
-  }
 }
 
 function bindNewsTabs() {
@@ -946,11 +921,11 @@ function bindAdmin() {
   document.querySelectorAll("[data-admin-login]").forEach((form) => {
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      const username = form.querySelector('[name="username"]').value.trim();
+      const username = form.querySelector('[name="username"]').value.trim().toUpperCase();
       const password = form.querySelector('[name="password"]').value;
       const error = form.querySelector("[data-admin-error]");
       if (username === ADMIN_USER && password === ADMIN_PASS) {
-        localStorage.setItem(ADMIN_SESSION_KEY, "true");
+        localStorage.setItem(ADMIN_SESSION_KEY, ADMIN_SESSION_VALUE);
         location.href = "admin.html";
         return;
       }
