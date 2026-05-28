@@ -89,6 +89,13 @@ const defaultSchedules = [
   { date: "2026.06.27", title: "월말 롱런 데이", place: "도심 순환 코스", note: "15K 선택 코스" },
 ];
 
+const defaultMagazines = [
+  { title: "러닝의 루틴과 스토리를 한눈에", image: "picture/20251123_081255.jpg", description: "킹콩 러너스 클럽이 전하는 러닝 인사이트 콘텐츠입니다." },
+  { title: "서울 도심을 함께 달리는 사람들", image: "picture/20251123_081309(0).jpg", description: "함께 달린 순간과 모임의 분위기를 기록합니다." },
+  { title: "완주를 만드는 주간 훈련", image: "picture/20260426_093205.jpg", description: "정기런과 개인 루틴을 이어가는 멤버들의 장면입니다." },
+  { title: "정기런 전날 체크리스트", image: "picture/20260426_093301(0).jpg", description: "편하게 참여하기 위한 준비와 현장 이야기를 담았습니다." },
+];
+
 const PRODUCT_IMAGE_FALLBACK = "picture/1777181388630.jpg";
 const DEFAULT_PRODUCT_IMAGES = {
   "notice-0601": "picture/20260426_072346.jpg",
@@ -112,6 +119,7 @@ const defaultContent = {
   newsletters: defaultNewsletters,
   runnersVoice: defaultRunnersVoice,
   schedules: defaultSchedules,
+  magazines: defaultMagazines,
 };
 
 let siteContent = cloneData(defaultContent);
@@ -120,6 +128,7 @@ let notices = siteContent.notices;
 let newsletters = siteContent.newsletters;
 let runnersVoice = siteContent.runnersVoice;
 let schedules = siteContent.schedules;
+let magazines = siteContent.magazines;
 let adminSession = false;
 let contentLoadError = "";
 
@@ -144,6 +153,17 @@ function migrateProductImages(items) {
   });
 }
 
+function normalizeMagazines(items) {
+  return defaultMagazines.map((fallback, index) => {
+    const item = items?.[index] && typeof items[index] === "object" ? items[index] : {};
+    return {
+      title: item.title || fallback.title,
+      image: item.image || fallback.image,
+      description: item.description || fallback.description,
+    };
+  });
+}
+
 function applySiteContent(content) {
   const source = content && typeof content === "object" ? content : {};
   siteContent = {
@@ -152,12 +172,14 @@ function applySiteContent(content) {
     newsletters: Array.isArray(source.newsletters) ? source.newsletters : defaultNewsletters,
     runnersVoice: Array.isArray(source.runnersVoice) ? source.runnersVoice : defaultRunnersVoice,
     schedules: Array.isArray(source.schedules) ? source.schedules : defaultSchedules,
+    magazines: normalizeMagazines(source.magazines),
   };
   products = siteContent.products;
   notices = siteContent.notices;
   newsletters = siteContent.newsletters;
   runnersVoice = siteContent.runnersVoice;
   schedules = siteContent.schedules;
+  magazines = siteContent.magazines;
 }
 
 function loadCollection(name, fallback) {
@@ -379,20 +401,15 @@ function renderHome() {
         <h2>KINGKONG NEWS <a href="newsletter.html" aria-label="뉴스 더보기">↗</a></h2>
         <div class="news-tabs">
           <button type="button" class="is-active" data-news-tab="newsletter">최신뉴스레터</button>
-          <button type="button" data-news-tab="runners">러너의소리</button>
         </div>
       </div>
       <div class="news-list" data-news-list>${renderNewsList(newsletters)}</div>
     </section>
 
-    <section class="board-banners">
+    <section class="board-banners is-single">
       <a class="board-tile" href="magazine.html">
-        <img src="${asset("picture/20251123_104709.jpg")}" alt="러닝매거진">
-        <span>Insight, Club Magazine<br>러닝의 루틴과 스토리를 한눈에</span>
-      </a>
-      <a class="board-tile" href="runners.html">
-        <img src="${asset("picture/20260426_075120.jpg")}" alt="러너의 소리">
-        <span>Echo<br>러너의 소리, 함께 울리는 진짜 이야기들</span>
+        <img src="${asset("picture/20251123_104709.jpg")}" alt="킹콩매거진">
+        <span>KINGKONG Magazine<br>킹콩 러너스 클럽의 현장 사진과 이야기</span>
       </a>
     </section>
   `;
@@ -442,7 +459,7 @@ function renderStory() {
         <img src="${asset("picture/20260426_093654.jpg")}" alt="">
         <div><h2>RUN &amp; SHARE</h2><p>함께 달리고 서로의 성장을 나누는 클럽 문화를 소개합니다.</p></div>
       </a>
-      <a class="story-card" href="runners.html">
+      <a class="story-card" href="newsletter.html">
         <img src="${asset("picture/20260426_093721.jpg")}" alt="">
         <div><h2>SAFE &amp; FUN</h2><p>안전하게 모이고 즐겁게 이어가는 러닝 문화를 모았습니다.</p></div>
       </a>
@@ -540,47 +557,34 @@ function renderNewsletter() {
   return `
     ${pageTitle("KINGKONG NEWS", "최신 소식과 멤버 이야기를 확인하세요.")}
     <section class="section narrow">
-      <div class="story-grid">
-        <div>
-          <div class="section-title"><h2>최신뉴스레터</h2></div>
-          ${renderNewsList(newsletters)}
-        </div>
-        <div>
-          <div class="section-title"><h2>러너의소리</h2></div>
-          ${renderNewsList(runnersVoice)}
-        </div>
+      <div>
+        <div class="section-title"><h2>최신뉴스레터</h2></div>
+        ${renderNewsList(newsletters)}
       </div>
     </section>
   `;
 }
 
 function renderMagazine() {
-  const magazineImages = [
-    "picture/20251123_081255.jpg",
-    "picture/20251123_081309(0).jpg",
-    "picture/20260426_093205.jpg",
-    "picture/20260426_093301(0).jpg",
-  ];
   return `
-    ${pageTitle("러닝매거진", "러닝 루틴과 클럽 현장 이야기를 아카이브합니다.")}
-    <section class="section narrow story-grid">
-      ${["러닝의 루틴과 스토리를 한눈에", "서울 도심을 함께 달리는 사람들", "완주를 만드는 주간 훈련", "정기런 전날 체크리스트"].map((title, index) => `
-        <a class="story-card" href="newsletter.html">
-          <img src="${asset(magazineImages[index % magazineImages.length])}" alt="">
-          <div><h2>${title}</h2><p>킹콩 러너스 클럽이 전하는 러닝 인사이트 콘텐츠입니다.</p></div>
-        </a>
+    ${pageTitle("킹콩매거진", "킹콩 러너스 클럽의 현장 사진과 러닝 순간을 모았습니다.")}
+    <section class="section narrow story-grid magazine-grid">
+      ${magazines.map((item, index) => `
+        <button class="story-card magazine-card" type="button" data-gallery-open="${index}">
+          <img src="${asset(item.image)}" alt="${escapeHtml(item.title)}">
+          <div><h2>${escapeHtml(item.title)}</h2><p>${escapeHtml(item.description)}</p></div>
+        </button>
       `).join("")}
     </section>
+    <div class="gallery-lightbox" data-gallery-modal hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="킹콩매거진 사진 확대">
+      <button class="gallery-close" type="button" data-gallery-close aria-label="닫기">&times;</button>
+      <img src="" alt="" data-gallery-image>
+    </div>
   `;
 }
 
 function renderRunners() {
-  return `
-    ${pageTitle("러너의소리", "함께 울리는 진짜 이야기들을 모았습니다.")}
-    <section class="section narrow">
-      ${renderNewsList(runnersVoice)}
-    </section>
-  `;
+  return renderNewsletter();
 }
 
 function renderFaq() {
@@ -738,6 +742,19 @@ const ADMIN_SECTIONS = [
     ],
   },
   {
+    name: "magazines",
+    title: "킹콩매거진",
+    description: "킹콩매거진 4개 고정 카드의 사진과 문구를 관리합니다.",
+    publicHref: "magazine.html",
+    kind: "object",
+    fixed: true,
+    fields: [
+      { key: "title", label: "제목", placeholder: "매거진 제목" },
+      { key: "image", label: "이미지 URL", placeholder: "picture/20251123_081255.jpg", upload: true },
+      { key: "description", label: "설명", placeholder: "짧은 설명", multiline: true },
+    ],
+  },
+  {
     name: "newsletters",
     title: "뉴스레터",
     description: "홈과 KINGKONG NEWS 페이지의 최신 소식을 관리합니다.",
@@ -749,18 +766,6 @@ const ADMIN_SECTIONS = [
       { key: "2", label: "요약", placeholder: "소식 요약", multiline: true },
     ],
   },
-  {
-    name: "runnersVoice",
-    title: "러너의소리 / 갤러리",
-    description: "러너의소리 탭과 페이지에 보이는 멤버 이야기 콘텐츠를 관리합니다.",
-    publicHref: "runners.html",
-    kind: "array",
-    fields: [
-      { key: "0", label: "작성일", placeholder: "2026.05.26" },
-      { key: "1", label: "제목", placeholder: "첫 5K 완주 후기" },
-      { key: "2", label: "내용", placeholder: "멤버 이야기 요약", multiline: true },
-    ],
-  },
 ];
 
 function adminDefaults(name) {
@@ -770,6 +775,7 @@ function adminDefaults(name) {
     newsletters: defaultNewsletters,
     runnersVoice: defaultRunnersVoice,
     schedules: defaultSchedules,
+    magazines: defaultMagazines,
   }[name];
 }
 
@@ -780,6 +786,7 @@ function adminData(name) {
     newsletters,
     runnersVoice,
     schedules,
+    magazines,
   }[name];
 }
 
@@ -825,7 +832,7 @@ function renderAdminForm(section, item, index) {
     <form class="admin-edit-form" data-admin-form="${section.name}" data-index="${index}">
       <div class="admin-form-head">
         <strong>${isNew ? "새 항목 추가" : `항목 ${Number(index) + 1} 수정`}</strong>
-        ${isNew ? "" : `<button class="text-danger" type="button" data-admin-delete="${section.name}" data-index="${index}">삭제</button>`}
+        ${isNew || section.fixed ? "" : `<button class="text-danger" type="button" data-admin-delete="${section.name}" data-index="${index}">삭제</button>`}
       </div>
       <div class="admin-fields">
         ${section.fields.map((field) => renderAdminField(field, item)).join("")}
@@ -848,7 +855,7 @@ function renderAdminSection(section) {
           <a class="outline-btn" href="${section.publicHref || "index.html"}">공개 화면 보기</a>
           <button class="outline-btn" type="button" data-admin-reset="${section.name}">기본값 복원</button>
         </div>
-        ${renderAdminForm(section, null, "new")}
+        ${section.fixed ? "" : renderAdminForm(section, null, "new")}
         <div class="admin-current-list">
           ${items.map((item, index) => renderAdminForm(section, item, index)).join("")}
         </div>
@@ -962,6 +969,7 @@ function bindEvents() {
   bindNewsTabs();
   bindFaq();
   bindAdmin();
+  bindGalleryModal();
   bindFilters();
   bindDragScroll();
   bindProductScrollbar();
@@ -997,6 +1005,43 @@ function bindFaq() {
     button.addEventListener("click", () => {
       button.closest(".faq-item").classList.toggle("is-open");
     });
+  });
+}
+
+function bindGalleryModal() {
+  const modal = document.querySelector("[data-gallery-modal]");
+  if (!modal) return;
+
+  const image = modal.querySelector("[data-gallery-image]");
+  const closeButton = modal.querySelector("[data-gallery-close]");
+
+  function closeModal() {
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+    image.removeAttribute("src");
+    image.alt = "";
+    document.body.classList.remove("modal-open");
+  }
+
+  document.querySelectorAll("[data-gallery-open]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const item = magazines[Number(button.dataset.galleryOpen)];
+      if (!item) return;
+      image.src = asset(item.image);
+      image.alt = item.title || "킹콩매거진 사진";
+      modal.hidden = false;
+      modal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+      closeButton.focus();
+    });
+  });
+
+  closeButton.addEventListener("click", closeModal);
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) closeModal();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !modal.hidden) closeModal();
   });
 }
 
