@@ -368,7 +368,7 @@ function renderHome() {
     </section>
 
     <section class="split-banners">
-      <a class="split-banner" href="calendar.html">
+      <a class="split-banner has-copy" href="calendar.html">
         <img src="${asset("picture/20251017_180003.jpg")}" alt="">
         <div class="banner-copy">
           <h2>KINGKONG<br>Weekly Run Log</h2>

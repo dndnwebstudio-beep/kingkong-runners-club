@@ -657,12 +657,26 @@ button {
   object-fit: cover;
 }
 
+.split-banner.has-copy::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  content: "";
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.58) 0%, rgba(0, 0, 0, 0.28) 42%, rgba(0, 0, 0, 0.04) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0) 56%);
+  pointer-events: none;
+}
+
 .split-banner .banner-copy {
   position: absolute;
   top: 50%;
   left: min(14vw, 260px);
+  z-index: 2;
   transform: translateY(-50%);
   max-width: 420px;
+  color: #fff;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
 }
 
 .split-banner h2 {
@@ -674,7 +688,7 @@ button {
 
 .split-banner p {
   margin: 16px 0 50px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.88);
   font-size: 20px;
   font-weight: 400;
   line-height: 1.4;
@@ -682,10 +696,11 @@ button {
 
 .text-link {
   display: inline-block;
-  color: var(--ink);
+  color: #fff;
   font-size: 16px;
   text-decoration: underline;
   text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
 }
 
 .news-section {
