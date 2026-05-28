@@ -531,6 +531,10 @@ button {
   min-width: 0;
 }
 
+.product-card-link {
+  display: block;
+}
+
 .product-thumb {
   display: block;
   aspect-ratio: 1 / 1;
@@ -550,6 +554,7 @@ button {
 }
 
 .product-info {
+  display: block;
   margin-top: 28px;
   text-align: center;
 }
@@ -563,6 +568,7 @@ button {
 }
 
 .product-price {
+  display: block;
   margin-top: 12px;
   color: var(--ink);
   font-size: 18px;
@@ -715,6 +721,10 @@ button {
 
 .news-list {
   width: min(950px, calc(100vw - 520px));
+}
+
+.news-list.is-full {
+  width: 100%;
 }
 
 .news-item {

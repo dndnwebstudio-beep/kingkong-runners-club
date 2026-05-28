@@ -6,11 +6,11 @@ const navItems = [
     href: "brand.html",
     children: [
       { label: "클럽 소개", href: "brand.html" },
-      { label: "러닝 STORY", href: "story.html" },
+      { label: "킹콩매거진", href: "magazine.html" },
+      { label: "킹콩뉴스", href: "newsletter.html" },
     ],
   },
   { label: "러닝일정", href: "calendar.html" },
-  { label: "가입안내", href: "register.html" },
   { label: "공지사항", href: "notice.html" },
 ];
 
@@ -21,6 +21,7 @@ const defaultProducts = [
     price: "매주 토요일 오전 7시",
     image: "picture/20260426_072346.jpg",
     type: "notice",
+    href: "calendar.html",
     date: "2026.05.28",
     summary: "킹콩 러너스 클럽의 6월 정기런, 야간런, 초보 러너 모임 일정을 한눈에 확인하세요.",
   },
@@ -30,6 +31,7 @@ const defaultProducts = [
     price: "상시 모집",
     image: "picture/20260314_074610.jpg",
     type: "guide",
+    href: "notice.html?id=0",
     date: "2026.05.28",
     summary: "처음 달리는 러너도 환영합니다. 가입 절차, 준비물, 오픈채팅 참여 방법을 안내합니다.",
   },
@@ -39,6 +41,7 @@ const defaultProducts = [
     price: "팔로우하세요.",
     image: "picture/20260426_093654.jpg",
     type: "channel",
+    href: "https://www.instagram.com/kingkongrunnersclub/",
     date: "상시",
     summary: "정기런 사진, 완주 후기, 번개런 소식을 공식 소셜 채널에서 빠르게 확인하세요.",
   },
@@ -48,6 +51,7 @@ const defaultProducts = [
     price: "6월 시작",
     image: "picture/20260329_072115.jpg",
     type: "event",
+    href: "notice.html?id=2",
     date: "2026.06.03",
     summary: "걷기와 조깅부터 5K 완주까지 함께 준비하는 4주 러닝 루틴입니다.",
   },
@@ -57,21 +61,22 @@ const defaultProducts = [
     price: "공지 알림",
     image: "picture/1777181388630.jpg",
     type: "channel",
+    href: "faq.html",
     date: "상시",
     summary: "모임 장소 변경, 우천 공지, 가입 안내를 카카오 채널에서 받아보세요.",
   },
 ];
 
 const defaultNotices = [
-  ["공지", "킹콩 러너스 클럽 6월 신규 회원 가입 안내", "관리자", "2026.05.28", "6월 신규 회원을 상시 모집합니다. 가입안내 메뉴에서 준비물과 참여 방법을 확인해 주세요."],
-  ["공지", "토요 정기런 집합 장소 및 준비물 안내", "관리자", "2026.05.26", "토요 정기런은 오전 7시 한강공원에서 시작합니다. 개인 물, 러닝화, 가벼운 여벌 옷을 준비해 주세요."],
+  ["공지", "킹콩 러너스 클럽 6월 신규 회원 가입 안내", "관리자", "2026.05.28", "6월 신규 회원을 상시 모집합니다. 공지사항에서 준비물과 참여 방법을 확인해 주세요."],
+  ["공지", "주1회 정기런 집합 장소 및 준비물 안내", "관리자", "2026.05.26", "주1회 정기런은 오전 7시 한강공원에서 시작합니다. 개인 물, 러닝화, 가벼운 여벌 옷을 준비해 주세요."],
   ["공지", "초보 러너 5K 챌린지 신청 안내", "운영팀", "2026.05.24", "걷기와 조깅부터 5K 완주까지 함께 준비하는 4주 프로그램입니다."],
   ["12", "러닝 후 뒤풀이 및 회비 사용 내역 공지", "운영팀", "2026.05.21", "월별 회비 사용 내역과 뒤풀이 신청 방식은 관리자 공지로 업데이트됩니다."],
   ["11", "우천 시 모임 운영 기준 안내", "운영팀", "2026.05.18", "우천 예보가 있을 경우 모임 당일 오전 카카오채널과 공지사항으로 진행 여부를 안내합니다."],
 ];
 
 const defaultNewsletters = [
-  ["2026.05.28", "KINGKONG NEWS, 6월 러닝 소식", "정기런 일정, 신규 회원 안내, 챌린지 모집 소식을 정리했습니다."],
+  ["2026.05.28", "킹콩뉴스, 6월 러닝 소식", "정기런 일정, 신규 회원 안내, 챌린지 모집 소식을 정리했습니다."],
   ["2026.05.22", "첫 모임 전 체크리스트", "러닝화, 개인 물, 여벌 옷 등 편하게 참여하기 위한 준비물을 안내합니다."],
   ["2026.05.15", "함께 달릴 때 더 오래 달립니다", "킹콩 러너스 클럽 멤버들의 페이스 그룹과 응원 문화를 소개합니다."],
 ];
@@ -83,7 +88,7 @@ const defaultRunnersVoice = [
 ];
 
 const defaultSchedules = [
-  { date: "2026.06.06", title: "토요 정기런", place: "한강공원 집결", note: "5K·10K 페이스 그룹" },
+  { date: "2026.06.06", title: "주1회 정기런", place: "한강공원 집결", note: "슬로우·패스트 트랙" },
   { date: "2026.06.13", title: "신규 회원 오리엔테이션", place: "러닝 후 카페 모임", note: "가입 안내 및 Q&A" },
   { date: "2026.06.20", title: "초보 러너 5K 챌린지", place: "트랙 러닝", note: "기초 자세와 페이스 연습" },
   { date: "2026.06.27", title: "월말 롱런 데이", place: "도심 순환 코스", note: "15K 선택 코스" },
@@ -103,6 +108,13 @@ const DEFAULT_PRODUCT_IMAGES = {
   instagram: "picture/20260426_093654.jpg",
   "challenge-5k": "picture/20260329_072115.jpg",
   kakao: "picture/1777181388630.jpg",
+};
+const DEFAULT_PRODUCT_LINKS = {
+  "notice-0601": "calendar.html",
+  "guide-2026": "notice.html?id=0",
+  instagram: "https://www.instagram.com/kingkongrunnersclub/",
+  "challenge-5k": "notice.html?id=2",
+  kakao: "faq.html",
 };
 
 const HAS_API = location.protocol !== "file:";
@@ -149,6 +161,7 @@ function migrateProductImages(items) {
       image: isExternalAsset(currentImage) || currentImage.startsWith("picture/")
         ? currentImage
         : DEFAULT_PRODUCT_IMAGES[item.id] || PRODUCT_IMAGE_FALLBACK,
+      href: item.href || DEFAULT_PRODUCT_LINKS[item.id] || `product.html?id=${encodeURIComponent(item.id || "")}`,
     };
   });
 }
@@ -342,15 +355,20 @@ function renderFooter() {
 }
 
 function productCard(product) {
+  const href = product.href || DEFAULT_PRODUCT_LINKS[product.id] || `product.html?id=${encodeURIComponent(product.id || "")}`;
+  const externalAttrs = /^https?:\/\//i.test(href) ? ` target="_blank" rel="noreferrer"` : "";
+
   return `
     <article class="product-card">
-      <a class="product-thumb" href="product.html?id=${product.id}">
-        <img src="${asset(product.image)}" alt="${product.name}">
+      <a class="product-card-link" href="${escapeHtml(href)}"${externalAttrs}>
+        <span class="product-thumb" aria-hidden="true">
+          <img src="${escapeHtml(asset(product.image))}" alt="">
+        </span>
+        <span class="product-info">
+          <span class="product-name">${escapeHtml(product.name)}</span>
+          <span class="product-price">${escapeHtml(product.price)}</span>
+        </span>
       </a>
-      <div class="product-info">
-        <a class="product-name" href="product.html?id=${product.id}">${product.name}</a>
-        <div class="product-price">${product.price}</div>
-      </div>
     </article>
   `;
 }
@@ -377,7 +395,7 @@ function renderHome() {
       <div class="product-track">
         ${products.map(productCard).join("")}
       </div>
-      <div class="product-scrollbar" role="scrollbar" aria-label="가입안내 목록 가로 스크롤" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0" data-product-scrollbar>
+      <div class="product-scrollbar" role="scrollbar" aria-label="주요 안내 카드 목록 가로 스크롤" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0" data-product-scrollbar>
         <span class="product-scrollbar-thumb"></span>
       </div>
     </section>
@@ -398,7 +416,7 @@ function renderHome() {
 
     <section class="news-section">
       <div class="news-left">
-        <h2>KINGKONG NEWS <a href="newsletter.html" aria-label="뉴스 더보기">↗</a></h2>
+        <h2>킹콩뉴스 <a href="newsletter.html" aria-label="뉴스 더보기">↗</a></h2>
         <div class="news-tabs">
           <button type="button" class="is-active" data-news-tab="newsletter">최신뉴스레터</button>
         </div>
@@ -416,11 +434,11 @@ function renderHome() {
 }
 
 function renderNewsList(items) {
-  return items.map((item) => `
-    <a class="news-item" href="newsletter.html">
-      <time>${item[0]}</time>
-      <strong>${item[1]}</strong>
-      <p>${item[2]}</p>
+  return items.map((item, index) => `
+    <a class="news-item" href="newsletter.html?id=${index}">
+      <time>${escapeHtml(item[0])}</time>
+      <strong>${escapeHtml(item[1])}</strong>
+      <p>${escapeHtml(item[2])}</p>
     </a>
   `).join("");
 }
@@ -442,8 +460,8 @@ function renderBrand() {
         <p>킹콩 러너스 클럽은 초보 러너부터 기록을 준비하는 러너까지 편하게 합류할 수 있는 커뮤니티입니다. 모임 일정, 가입 안내, 공지사항, 멤버 이야기를 보기 쉽게 정리합니다.</p>
         <p>러너는 정기런 일정, 참여 안내, 우천 공지, 클럽 뉴스와 후기를 한 화면에서 확인할 수 있습니다.</p>
         <div class="stat-row">
-          <div class="stat"><strong>SAT</strong><span>토요 정기런</span></div>
-          <div class="stat"><strong>5K·10K</strong><span>페이스 그룹 운영</span></div>
+          <div class="stat"><strong>SAT</strong><span>주1회 정기런</span></div>
+          <div class="stat"><strong>슬로우·패스트</strong><span>트랙 운영</span></div>
           <div class="stat"><strong>OPEN</strong><span>신규 회원 환영</span></div>
         </div>
       </div>
@@ -453,15 +471,15 @@ function renderBrand() {
 
 function renderStory() {
   return `
-    ${pageTitle("러닝 STORY", "킹콩 러너스 클럽의 모임, 챌린지, 멤버 이야기를 전합니다.")}
+    ${pageTitle("킹콩러너스 콘텐츠", "킹콩매거진과 킹콩뉴스를 바로 확인하세요.")}
     <section class="section narrow story-grid">
       <a class="story-card" href="magazine.html">
         <img src="${asset("picture/20260426_093654.jpg")}" alt="">
-        <div><h2>RUN &amp; SHARE</h2><p>함께 달리고 서로의 성장을 나누는 클럽 문화를 소개합니다.</p></div>
+        <div><h2>킹콩매거진</h2><p>킹콩 러너스 클럽의 현장 사진과 러닝 순간을 모았습니다.</p></div>
       </a>
       <a class="story-card" href="newsletter.html">
         <img src="${asset("picture/20260426_093721.jpg")}" alt="">
-        <div><h2>SAFE &amp; FUN</h2><p>안전하게 모이고 즐겁게 이어가는 러닝 문화를 모았습니다.</p></div>
+        <div><h2>킹콩뉴스</h2><p>정기런 일정, 가입 공지, 클럽 소식을 한곳에서 확인합니다.</p></div>
       </a>
     </section>
   `;
@@ -489,7 +507,7 @@ function renderCalendar() {
       <div class="calendar-box">
         <div class="calendar-head">
           <h2>${year}.${String(month).padStart(2, "0")}</h2>
-          <a class="outline-btn" href="register.html">가입안내</a>
+          <a class="outline-btn" href="notice.html">공지사항</a>
         </div>
         <div class="calendar-grid">
           ${days.map((day) => `<span>${day}</span>`).join("")}
@@ -498,7 +516,7 @@ function renderCalendar() {
       </div>
       <aside class="schedule-list">
         ${schedules.map((schedule) => `
-          <a class="schedule-card" href="register.html">
+          <a class="schedule-card" href="notice.html">
             <time>${schedule.date}</time>
             <strong>${schedule.title}</strong>
             <p>${schedule.place} · ${schedule.note}</p>
@@ -564,8 +582,27 @@ function renderNotice() {
 }
 
 function renderNewsletter() {
+  const requestedId = Number(new URLSearchParams(location.search).get("id"));
+  const selected = Number.isInteger(requestedId) ? newsletters[requestedId] : null;
+  if (selected) {
+    return `
+      ${pageTitle(selected[1], selected[0])}
+      <section class="section narrow">
+        <article class="notice-detail">
+          <div class="notice-detail-meta"><span>킹콩뉴스</span><span>${escapeHtml(selected[0])}</span></div>
+          <p>${escapeHtml(selected[2])}</p>
+        </article>
+        <div class="section-title notice-list-title">
+          <h2>전체 뉴스</h2>
+          <p>킹콩 러너스 클럽의 다른 소식도 함께 확인하세요.</p>
+        </div>
+        <div class="news-list is-full">${renderNewsList(newsletters)}</div>
+      </section>
+    `;
+  }
+
   return `
-    ${pageTitle("KINGKONG NEWS", "최신 소식과 멤버 이야기를 확인하세요.")}
+    ${pageTitle("킹콩뉴스", "최신 소식과 멤버 이야기를 확인하세요.")}
     <section class="section narrow">
       <div>
         <div class="section-title"><h2>최신뉴스레터</h2></div>
@@ -599,7 +636,7 @@ function renderRunners() {
 
 function renderFaq() {
   const faqs = [
-    ["가입은 어디에서 하나요?", "가입안내 메뉴에서 신규 회원 공지를 확인한 뒤 안내된 채널로 신청할 수 있습니다."],
+    ["가입은 어디에서 하나요?", "공지사항에서 신규 회원 공지를 확인한 뒤 안내된 채널로 신청할 수 있습니다."],
     ["처음 달려도 참여할 수 있나요?", "네. 초보 러너를 위한 5K 페이스 그룹과 오리엔테이션 모임을 운영합니다."],
     ["정기런 일정은 어디에서 확인하나요?", "러닝일정 메뉴와 공지사항에서 이번 달 모임 일정을 확인할 수 있습니다."],
     ["문의는 어떻게 하나요?", "카카오채널 @킹콩러너스클럽으로 문의해 주세요."],
@@ -726,9 +763,9 @@ const ADMIN_SECTIONS = [
     kind: "object",
     fields: [
       { key: "date", label: "날짜", placeholder: "2026.06.06" },
-      { key: "title", label: "일정명", placeholder: "토요 정기런" },
+      { key: "title", label: "일정명", placeholder: "주1회 정기런" },
       { key: "place", label: "장소", placeholder: "한강공원 집결" },
-      { key: "note", label: "메모", placeholder: "5K·10K 페이스 그룹" },
+      { key: "note", label: "메모", placeholder: "슬로우·패스트 트랙" },
     ],
   },
   {
@@ -746,13 +783,13 @@ const ADMIN_SECTIONS = [
   },
   {
     name: "newsletters",
-    title: "KINGKONG NEWS",
+    title: "킹콩뉴스",
     description: "홈 화면과 뉴스 페이지에 보이는 짧은 소식 목록을 관리합니다.",
     publicHref: "newsletter.html",
     kind: "array",
     fields: [
       { key: "0", label: "작성일", placeholder: "2026.05.28" },
-      { key: "1", label: "제목", placeholder: "KINGKONG NEWS" },
+      { key: "1", label: "제목", placeholder: "킹콩뉴스" },
       { key: "2", label: "요약", placeholder: "소식 요약", multiline: true },
     ],
   },
@@ -961,6 +998,7 @@ function bindEvents() {
   bindAdmin();
   bindGalleryModal();
   bindFilters();
+  bindLinkNavigation();
   bindDragScroll();
   bindProductScrollbar();
 }
@@ -1220,6 +1258,25 @@ function bindFilters() {
   });
 }
 
+function bindLinkNavigation() {
+  document.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target : event.target.parentElement;
+    const link = target?.closest(".product-card-link, .news-item");
+    if (!link || event.defaultPrevented) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+
+    const href = link.getAttribute("href");
+    if (!href || href.startsWith("#")) return;
+
+    event.preventDefault();
+    if (link.target === "_blank") {
+      window.open(link.href, "_blank", "noopener,noreferrer");
+      return;
+    }
+    window.location.href = href;
+  });
+}
+
 function bindDragScroll() {
   document.querySelectorAll(".product-track").forEach((track) => {
     let isDown = false;
@@ -1228,9 +1285,10 @@ function bindDragScroll() {
     let scrollLeft = 0;
 
     track.addEventListener("pointerdown", (event) => {
-      if (event.button !== 0) return;
-      isDown = true;
+      const target = event.target instanceof Element ? event.target : event.target.parentElement;
       didDrag = false;
+      if (event.button !== 0 || target?.closest("a")) return;
+      isDown = true;
       startX = event.clientX;
       scrollLeft = track.scrollLeft;
       track.classList.add("is-dragging");
@@ -1261,6 +1319,7 @@ function bindDragScroll() {
       if (!didDrag) return;
       event.preventDefault();
       event.stopPropagation();
+      didDrag = false;
     }, true);
   });
 }
