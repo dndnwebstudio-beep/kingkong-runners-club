@@ -1339,6 +1339,24 @@ body.modal-open {
   white-space: pre-wrap;
 }
 
+.join-guide-card h2 {
+  margin: 0 0 18px;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.join-guide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.notice-list-title {
+  margin-top: 56px;
+}
+
 .page-actions {
   margin-top: 32px;
   text-align: center;
@@ -1737,8 +1755,18 @@ body.modal-open {
   }
 
   .header-inner {
-    grid-template-columns: auto 1fr auto;
+    display: flex;
+    justify-content: space-between;
     gap: 18px;
+  }
+
+  .header-utils {
+    margin-left: auto;
+    justify-content: flex-end;
+  }
+
+  .menu-toggle {
+    flex: 0 0 44px;
   }
 
   .menu-toggle {

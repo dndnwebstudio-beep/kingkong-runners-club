@@ -510,20 +510,27 @@ function renderCalendar() {
 }
 
 function renderRegister() {
+  const joinNoticeIndex = notices.findIndex((notice) => String(notice[1] || "").includes("가입"));
+  const noticeIndex = joinNoticeIndex >= 0 ? joinNoticeIndex : 0;
+  const joinNotice = notices[noticeIndex] || defaultNotices[0];
+
   return `
-    ${pageTitle("가입안내", "현재 참여 가능한 모임과 가입 채널을 확인하세요.")}
-    <section class="section container">
-      <div class="filter-row">
-        <select aria-label="정렬">
-          <option>최신공지</option>
-          <option>모임명</option>
-          <option>채널안내</option>
-        </select>
-        <input type="search" placeholder="모임 또는 공지 검색" aria-label="모임 또는 공지 검색" data-list-filter>
+    ${pageTitle("가입안내", "가입 관련 내용은 공지사항 게시글로 관리합니다.")}
+    <section class="section narrow">
+      <article class="notice-detail join-guide-card">
+        <div class="notice-detail-meta"><span>가입안내</span><span>${joinNotice[3]}</span></div>
+        <h2>${escapeHtml(joinNotice[1])}</h2>
+        <p>${escapeHtml(joinNotice[4])}</p>
+        <div class="join-guide-actions">
+          <a class="primary-btn" href="notice.html?id=${noticeIndex}">가입 공지 자세히 보기</a>
+          <a class="outline-btn" href="notice.html">전체 공지사항</a>
+        </div>
+      </article>
+      <div class="section-title notice-list-title">
+        <h2>가입 관련 공지</h2>
+        <p>가입 안내, 정기런 참여 방법, 운영 공지는 공지사항에서 함께 관리합니다.</p>
       </div>
-      <div class="list-grid" data-filter-target>
-        ${products.map(productCard).join("")}
-      </div>
+      ${boardTable(notices)}
     </section>
   `;
 }
@@ -539,7 +546,11 @@ function renderNotice() {
           <div class="notice-detail-meta"><span>${selected[0]}</span><span>${selected[3]}</span></div>
           <p>${selected[4] || "상세 내용은 관리자 페이지에서 추가할 수 있습니다."}</p>
         </article>
-        <div class="page-actions"><a class="outline-btn" href="notice.html">목록으로</a></div>
+        <div class="section-title notice-list-title">
+          <h2>전체 공지사항</h2>
+          <p>다른 공지와 가입 안내 글도 함께 확인할 수 있습니다.</p>
+        </div>
+        ${boardTable(notices)}
       </section>
     `;
   }
@@ -548,7 +559,6 @@ function renderNotice() {
     ${pageTitle("공지사항", "킹콩 러너스 클럽의 소식, 가입 안내, 모임 운영 공지입니다.")}
     <section class="section narrow">
       ${boardTable(notices)}
-      ${pagination()}
     </section>
   `;
 }
@@ -682,10 +692,6 @@ function boardTable(rows) {
   `;
 }
 
-function pagination() {
-  return `<div class="pagination"><a class="is-active" href="#">1</a><a href="#">2</a><a href="#">3</a></div>`;
-}
-
 function legalPage(title, sections) {
   return `
     ${pageTitle(title, "킹콩 러너스 클럽 홈페이지 이용 안내")}
@@ -700,16 +706,16 @@ function legalPage(title, sections) {
 const ADMIN_SECTIONS = [
   {
     name: "notices",
-    title: "공지사항 게시판",
-    description: "공지 목록과 클릭 후 보이는 상세 내용을 관리합니다.",
+    title: "공지사항 / 가입안내",
+    description: "가입안내, 정기런 공지, 운영 공지를 모두 게시글로 관리합니다.",
     publicHref: "notice.html",
     kind: "array",
     fields: [
-      { key: "0", label: "번호", placeholder: "공지 또는 숫자" },
+      { key: "0", label: "분류/번호", placeholder: "공지 또는 숫자" },
       { key: "1", label: "제목", placeholder: "공지 제목" },
       { key: "2", label: "작성자", placeholder: "관리자" },
       { key: "3", label: "작성일", placeholder: "2026.05.28" },
-      { key: "4", label: "상세 내용", placeholder: "공지 상세 내용", multiline: true },
+      { key: "4", label: "본문", placeholder: "공지 상세 내용", multiline: true },
     ],
   },
   {
@@ -726,25 +732,9 @@ const ADMIN_SECTIONS = [
     ],
   },
   {
-    name: "products",
-    title: "가입안내 / 갤러리 카드",
-    description: "홈 카드, 가입안내 목록, 상세보기 화면과 이미지를 관리합니다.",
-    publicHref: "register.html",
-    kind: "object",
-    fields: [
-      { key: "id", label: "ID", placeholder: "guide-2026" },
-      { key: "name", label: "제목", placeholder: "신규 회원 가입 안내" },
-      { key: "price", label: "보조 문구", placeholder: "상시 모집" },
-      { key: "image", label: "이미지 URL", placeholder: "picture/20260314_074610.jpg", upload: true },
-      { key: "type", label: "분류", placeholder: "guide / event / channel / notice" },
-      { key: "date", label: "날짜", placeholder: "2026.05.28" },
-      { key: "summary", label: "설명", placeholder: "카드와 상세 화면에 보일 설명", multiline: true },
-    ],
-  },
-  {
     name: "magazines",
-    title: "킹콩매거진",
-    description: "킹콩매거진 4개 고정 카드의 사진과 문구를 관리합니다.",
+    title: "킹콩매거진 갤러리",
+    description: "4개 고정 갤러리 카드의 사진, 제목, 설명만 관리합니다.",
     publicHref: "magazine.html",
     kind: "object",
     fixed: true,
@@ -756,8 +746,8 @@ const ADMIN_SECTIONS = [
   },
   {
     name: "newsletters",
-    title: "뉴스레터",
-    description: "홈과 KINGKONG NEWS 페이지의 최신 소식을 관리합니다.",
+    title: "KINGKONG NEWS",
+    description: "홈 화면과 뉴스 페이지에 보이는 짧은 소식 목록을 관리합니다.",
     publicHref: "newsletter.html",
     kind: "array",
     fields: [
@@ -866,7 +856,7 @@ function renderAdminSection(section) {
 
 function renderAdminLogin() {
   return `
-    ${pageTitle("ADMIN", "관리자 로그인 후 게시판, 러닝일정, 가입안내, 갤러리 콘텐츠를 수정할 수 있습니다.")}
+    ${pageTitle("ADMIN", "관리자 로그인 후 공지사항, 일정, 갤러리, 뉴스 콘텐츠를 수정할 수 있습니다.")}
     <section class="section">
       <form class="auth-box" data-admin-login>
         <label>아이디<input required type="text" name="username" autocomplete="username"></label>
@@ -890,7 +880,7 @@ function renderAdmin() {
       <div class="admin-toolbar">
         <div>
           <strong>관리자 모드</strong>
-          <span>게시판, 일정, 안내 카드, 갤러리성 콘텐츠를 저장소에 바로 반영합니다.</span>
+          <span>가입안내는 공지사항 글로 관리하고, 갤러리와 뉴스는 각각의 영역에서 수정합니다.</span>
         </div>
         <div class="admin-toolbar-actions">
           <a class="outline-btn" href="index.html">홈 확인</a>
@@ -907,7 +897,7 @@ function renderAdmin() {
         `).join("")}
       </div>
       ${contentLoadError ? `<p class="form-error">${escapeHtml(contentLoadError)}</p>` : ""}
-      <p class="admin-note">항목을 추가하거나 수정하면 Vercel Blob 저장소에 저장되고 공개 페이지가 같은 데이터를 불러옵니다.</p>
+      <p class="admin-note">가입안내 글은 공지사항 / 가입안내에서 작성하세요. 저장하면 Vercel Blob 저장소에 반영되고 공개 페이지가 같은 데이터를 불러옵니다.</p>
       ${ADMIN_SECTIONS.map(renderAdminSection).join("")}
     </section>
   `;
@@ -1045,37 +1035,30 @@ function bindGalleryModal() {
   });
 }
 
-function bindAdmin() {
-  document.querySelectorAll("[data-admin-login]").forEach((form) => {
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const username = form.querySelector('[name="username"]').value.trim().toUpperCase();
-      const password = form.querySelector('[name="password"]').value;
-      const error = form.querySelector("[data-admin-error]");
+function updateAdminQuickCount(sectionName) {
+  const quickCount = document.querySelector(`.admin-quick-card[href="#admin-${sectionName}"] strong`);
+  const items = adminData(sectionName);
+  if (quickCount && items) quickCount.textContent = items.length;
+}
 
-      if (error) error.textContent = "";
-      form.querySelector("button[type='submit']").disabled = true;
-      try {
-        await requestJson(API_ENDPOINTS.login, {
-          method: "POST",
-          body: JSON.stringify({ username, password }),
-        });
-        location.href = "admin.html";
-      } catch (requestError) {
-        if (error) error.textContent = requestError.message;
-      } finally {
-        form.querySelector("button[type='submit']").disabled = false;
-      }
-    });
-  });
+function refreshAdminSection(sectionName) {
+  const section = ADMIN_SECTIONS.find((item) => item.name === sectionName);
+  const current = document.getElementById(`admin-${sectionName}`);
+  if (!section || !current) return;
 
-  document.querySelector("[data-admin-logout]")?.addEventListener("click", async () => {
-    await requestJson(API_ENDPOINTS.logout, { method: "POST", body: "{}" }).catch(() => {});
-    adminSession = false;
-    location.href = "admin.html";
-  });
+  const shouldStayOpen = current.open;
+  current.outerHTML = renderAdminSection(section);
 
-  document.querySelectorAll("[data-admin-reset]").forEach((button) => {
+  const next = document.getElementById(`admin-${sectionName}`);
+  if (next) {
+    next.open = shouldStayOpen;
+    bindAdminCollectionControls(next);
+  }
+  updateAdminQuickCount(sectionName);
+}
+
+function bindAdminCollectionControls(scope = document) {
+  scope.querySelectorAll("[data-admin-reset]").forEach((button) => {
     button.addEventListener("click", async (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -1083,7 +1066,7 @@ function bindAdmin() {
       button.disabled = true;
       try {
         await resetCollection(button.dataset.adminReset);
-        location.reload();
+        refreshAdminSection(button.dataset.adminReset);
       } catch (error) {
         alert(error.message);
         button.disabled = false;
@@ -1091,7 +1074,7 @@ function bindAdmin() {
     });
   });
 
-  document.querySelectorAll("[data-admin-delete]").forEach((button) => {
+  scope.querySelectorAll("[data-admin-delete]").forEach((button) => {
     button.addEventListener("click", async () => {
       if (!confirm("이 항목을 삭제할까요?")) return;
       const sectionName = button.dataset.adminDelete;
@@ -1100,7 +1083,7 @@ function bindAdmin() {
       button.disabled = true;
       try {
         await saveCollection(sectionName, items);
-        location.reload();
+        refreshAdminSection(sectionName);
       } catch (error) {
         alert(error.message);
         button.disabled = false;
@@ -1108,7 +1091,7 @@ function bindAdmin() {
     });
   });
 
-  document.querySelectorAll("[data-admin-upload-button]").forEach((button) => {
+  scope.querySelectorAll("[data-admin-upload-button]").forEach((button) => {
     button.addEventListener("click", async () => {
       const form = button.closest("[data-admin-form]");
       const key = button.dataset.adminUploadButton;
@@ -1144,7 +1127,7 @@ function bindAdmin() {
     });
   });
 
-  document.querySelectorAll("[data-admin-form]").forEach((form) => {
+  scope.querySelectorAll("[data-admin-form]").forEach((form) => {
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const sectionName = form.dataset.adminForm;
@@ -1162,12 +1145,6 @@ function bindAdmin() {
         }
       });
 
-      if (sectionName === "products") {
-        if (!nextItem.id) nextItem.id = `item-${Date.now()}`;
-        if (!nextItem.image) nextItem.image = PRODUCT_IMAGE_FALLBACK;
-        if (!nextItem.type) nextItem.type = "notice";
-      }
-
       if (form.dataset.index === "new") {
         items.unshift(nextItem);
       } else {
@@ -1180,14 +1157,51 @@ function bindAdmin() {
       setAdminStatus(status, "저장하는 중입니다.", "info");
       try {
         await saveCollection(sectionName, items);
+        if (form.dataset.index === "new") {
+          refreshAdminSection(sectionName);
+          return;
+        }
         setAdminStatus(status, "저장되었습니다.", "success");
-        location.reload();
+        submit.disabled = false;
       } catch (error) {
         setAdminStatus(status, error.message, "error");
         submit.disabled = false;
       }
     });
   });
+}
+
+function bindAdmin() {
+  document.querySelectorAll("[data-admin-login]").forEach((form) => {
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const username = form.querySelector('[name="username"]').value.trim().toUpperCase();
+      const password = form.querySelector('[name="password"]').value;
+      const error = form.querySelector("[data-admin-error]");
+
+      if (error) error.textContent = "";
+      form.querySelector("button[type='submit']").disabled = true;
+      try {
+        await requestJson(API_ENDPOINTS.login, {
+          method: "POST",
+          body: JSON.stringify({ username, password }),
+        });
+        location.href = "admin.html";
+      } catch (requestError) {
+        if (error) error.textContent = requestError.message;
+      } finally {
+        form.querySelector("button[type='submit']").disabled = false;
+      }
+    });
+  });
+
+  document.querySelector("[data-admin-logout]")?.addEventListener("click", async () => {
+    await requestJson(API_ENDPOINTS.logout, { method: "POST", body: "{}" }).catch(() => {});
+    adminSession = false;
+    location.href = "admin.html";
+  });
+
+  bindAdminCollectionControls();
 }
 
 function setAdminStatus(target, message, type) {
